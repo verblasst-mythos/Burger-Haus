@@ -61,7 +61,7 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
 .item{display:flex;flex-direction:column;gap:.3rem;padding:1.2rem 1.3rem;background:var(--panel);border:1px solid var(--line);border-radius:18px}
 .item .top{display:flex;justify-content:space-between;gap:1rem;align-items:baseline}
 .item h3{font-size:1.6rem}.item .pr{font:400 1.5rem 'Bebas Neue';color:var(--cyan)}
-.item p{margin:0;color:var(--muted);font-size:.9rem}
+.item p{white-space:pre-line;margin:0;color:var(--muted);font-size:.9rem}
 .combo{border-color:#ff2d8f88;box-shadow:0 0 30px #ff2d8f22}
 .note{color:var(--muted);font-size:.8rem;margin-top:1.2rem}
 .info{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1.4rem}
@@ -100,12 +100,12 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
   <h2>Unsere <span class="pink">Speisekarte</span></h2>
   <div class="cats" id="cats" role="tablist" aria-label="Kategorien"></div>
   <div class="menu" id="menuGrid"></div>
-  <p class="note">Alle Preise in Euro inkl. MwSt. Allergene und Zusatzstoffe nennen wir dir gern an der Theke.</p>
+  <p class="note">Preise in Euro. Allergene und Zusatzstoffe nennen wir dir gern an der Theke.</p>
 </section>
 
 <section id="menues">
   <h2>Unsere <span class="cyan">Menüs</span></h2>
-  <p style="color:var(--muted);max-width:60ch">Burger, Beilage und Getränk im Paket. Das spart Geld und der zehnte Stempel auf deiner Bonus Card bringt dir das Smart Menü sogar gratis.</p>
+  <p style="color:var(--muted);max-width:60ch">Große Pakete für Gruppen, Feiern und Events. Frag an der Theke nach Vorbestellung.</p>
   <div class="menu" id="comboGrid" style="margin-top:1.4rem"></div>
 </section>
 
@@ -255,33 +255,32 @@ const errText = e => ({already_spun:"Heute hast du schon gedreht. Komm morgen wi
 
 // ---- Speisekarte & Menüs (Preise hier anpassen) ----
 const MENU = {
-  "Smash Burger":[
-    ["Classic Smash","Smash-Patty, Salat, Tomate, Zwiebel, Burgersauce","7,90"],
-    ["Cheese Smash","Smash-Patty, Cheddar, Pickles, Burgersauce","8,50"],
-    ["Double Smash","Zwei Patties, doppelt Cheddar, Pickles, Burgersauce","10,90"],
-    ["Bacon BBQ Smash","Smash-Patty, Bacon, Cheddar, Röstzwiebeln, BBQ-Sauce","10,50"],
-    ["Crispy Chicken","Knuspriges Hähnchen, Salat, Mayo, Pickles","9,50"],
-    ["Veggie Smash","Veggie-Patty, Salat, Tomate, Zwiebel, Kräutersauce","9,00"]],
-  "Wings & Beilagen":[
-    ["Wings (6 Stück)","Knusprig, mit Dip nach Wahl","6,90"],
-    ["Wings (12 Stück)","Knusprig, mit zwei Dips nach Wahl","11,90"],
-    ["Pommes","Goldgelb und knusprig","3,50"],
-    ["Cheese Fries","Pommes mit Cheddarsauce","4,90"],
-    ["Onion Rings","Panierte Zwiebelringe mit Dip","4,50"]],
-  "Drinks":[
-    ["Softdrink 0,33 l","Cola, Fanta oder Sprite","2,90"],
-    ["Eistee 0,33 l","Pfirsich oder Zitrone","3,20"],
-    ["Wasser 0,33 l","Still oder sprudelnd","2,50"],
-    ["Milkshake","Vanille, Schoko oder Erdbeere","4,90"]]
+  "Burger":[
+    ["Burgerhaus TS","","200"],
+    ["Chickenburger","","220"],
+    ["Wingsburger","","210"]],
+  "Snacks":[
+    ["Pommes","","180"],
+    ["Curley Fries","","200"],
+    ["Classic Wings","","230"],
+    ["Hot Wings","","240"]],
+  "Getränke":[
+    ["Eistee","","160"],
+    ["Energy Drink","","200"],
+    ["Cola","","160"],
+    ["Milkshake","","190"]],
+  "Winter Edition":[
+    ["Crêpes","","170"],
+    ["Glühwein mit Schuss","","200"]]
 };
 const COMBOS=[
-  ["Smart Menü","Ein Burger deiner Wahl, dazu Pommes und ein Softdrink. Der Klassiker, den du mit der Bonus Card gratis bekommst.","+ 4,90 zum Burger"],
-  ["Wings Menü","Sechs Wings, Pommes, ein Dip und ein Softdrink.","10,90"],
-  ["Duo Menü","Zwei Burger, große Pommes zum Teilen und zwei Softdrinks.","24,90"]];
+  ["Chicken Menü","5x Pommes\n5x Wingsburger\n5x Curley Fries\n5x Classic Wings\n5x Hot Wings","5850"],
+  ["Smart Menü","20x Burgerhaus TS\n20x Energy Drinks","10500"],
+  ["Burgerhaus Menü","10x Burgerhaus TS\n10x Chickenburger\n10x Hotwings\n10x Curly Fries\n10x Eistee\n10x Milkshake\n10x Energy Drink\n10x ECola","17000"]];
 function renderMenu(cat){
   const g=$("menuGrid");g.replaceChildren();
   MENU[cat].forEach(([n,d,pr])=>{const c=el("div",null,"item"),t=el("div",null,"top");
-    t.append(el("h3",n),el("span",pr+" €","pr"));c.append(t,el("p",d));g.append(c)});
+    t.append(el("h3",n),el("span",pr+" €","pr"));if(d)c.append(t,el("p",d));else c.append(t);g.append(c)});
   document.querySelectorAll("#cats button").forEach(b=>{const on=b.textContent===cat;b.className="btn"+(on?"":" o");b.setAttribute("aria-selected",on)});
 }
 Object.keys(MENU).forEach(k=>{const b=el("button",k,"btn o");b.type="button";b.setAttribute("role","tab");b.onclick=()=>renderMenu(k);$("cats").append(b)});
