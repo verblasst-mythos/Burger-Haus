@@ -202,7 +202,7 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
   <h3>Verantwortlicher</h3>
   <p>Cano Yilmaz, BURGERHAUS, [Anschrift], E-Mail: [E-Mail-Adresse]</p>
   <h3>Konto und Bonus Card</h3>
-  <p>Bei der Registrierung speichern wir deine E-Mail-Adresse, dein Passwort (nur verschlüsselt als Hash), deinen Namen, deine Kunden-ID, deine Stempel sowie deine Glücksrad-Gewinne. Zweck ist die Bereitstellung der Bonus Card und des Glücksrads (Art. 6 Abs. 1 lit. b DSGVO). Mitarbeiter des BURGERHAUS können deinen Namen, deine Kunden-ID, Stempel und Gewinne einsehen, um Stempel zu vergeben und Gewinne einzulösen. Du kannst dein Konto jederzeit löschen lassen, schreib uns dazu eine E-Mail.</p>
+  <p>Bei der Registrierung speichern wir deinen Namen, dein Passwort (nur verschlüsselt als Hash), deine Kunden-ID, deine Stempel sowie deine Glücksrad-Gewinne. Zweck ist die Bereitstellung der Bonus Card und des Glücksrads (Art. 6 Abs. 1 lit. b DSGVO). Mitarbeiter des BURGERHAUS können deinen Namen, deine Kunden-ID, Stempel und Gewinne einsehen, um Stempel zu vergeben und Gewinne einzulösen. Du kannst dein Konto jederzeit löschen lassen, sprich uns dazu an der Theke an.</p>
   <h3>Hosting und technische Dienste</h3>
   <p>Die Kontodaten werden bei Supabase gespeichert. Die Seite wird über [Hosting-Anbieter, z. B. Cloudflare] ausgeliefert, dabei werden technisch notwendige Verbindungsdaten wie die IP-Adresse verarbeitet. Skripte laden wir vom CDN jsDelivr, Schriftarten von Google Fonts. [Wenn möglich: Schriften lokal einbinden.]</p>
   <h3>Cookies und lokale Speicherung</h3>
@@ -218,8 +218,7 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
     <button class="btn o" id="tReg" type="button">Registrieren</button>
   </div>
   <form id="authForm">
-    <div id="nameWrap" class="hide"><label for="nm">Name</label><input id="nm" autocomplete="name"></div>
-    <label for="em">E-Mail</label><input id="em" type="email" required autocomplete="email">
+    <label for="nm">Name</label><input id="nm" required minlength="3" maxlength="40" autocomplete="username">
     <label for="pw">Passwort (mind. 8 Zeichen)</label><input id="pw" type="password" minlength="8" required autocomplete="current-password">
     <p class="msg" id="authMsg" role="status"></p>
     <div class="row" style="margin-top:0"><button class="btn" id="authGo">Anmelden</button><button class="btn o" type="button" id="closeDlg">Abbrechen</button></div>
@@ -293,8 +292,10 @@ document.querySelectorAll("[data-legal]").forEach(b=>b.onclick=()=>$(b.dataset.l
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 $("teamLogin").onclick=()=>{if(!me)openAuth("login");else if(isStaff())location.hash="#team";else alert("Dein Konto hat keinen Mitarbeiterzugang.")};
 
-// ---- Auth ----
-function setMode(m){mode=m;$("nameWrap").classList.toggle("hide",m!=="reg");
+// ---- Auth (Login per Name, intern als Pseudo-E-Mail) ----
+const LOGIN_DOMAIN = "burgerhaus-kunden.de"; // Nur intern für Supabase, es werden keine Mails verschickt
+const toEmail = n => { const u=n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,".").replace(/^\.+|\.+$/g,""); return u?u+"@"+LOGIN_DOMAIN:""; };
+function setMode(m){mode=m;
   $("tLogin").className="btn"+(m==="login"?"":" o");$("tReg").className="btn"+(m==="reg"?"":" o");
   $("authGo").textContent=m==="login"?"Anmelden":"Konto anlegen";
   $("pw").autocomplete=m==="login"?"current-password":"new-password";$("authMsg").textContent="";}
@@ -306,12 +307,13 @@ document.querySelectorAll("[data-auth]").forEach(b=>b.onclick=()=>me?location.ha
 
 $("authForm").onsubmit=async e=>{
   e.preventDefault();const m=$("authMsg");m.className="msg";m.textContent="Bitte warten …";
-  const email=$("em").value.trim(),password=$("pw").value;
+  const email=toEmail($("nm").value),password=$("pw").value;
+  if(!email){m.className="msg err";m.textContent="Bitte gib einen Namen mit Buchstaben oder Zahlen ein.";return}
   const {data,error}=mode==="login"
     ? await db.auth.signInWithPassword({email,password})
     : await db.auth.signUp({email,password,options:{data:{name:$("nm").value.trim()}}});
-  if(error){m.className="msg err";m.textContent=error.message;return}
-  if(mode==="reg"&&!data.session){m.textContent="Fast fertig: Bestätige deine E-Mail und melde dich dann an.";return}
+  if(error){m.className="msg err";m.textContent=/invalid login/i.test(error.message)?"Name oder Passwort falsch.":/already|registered/i.test(error.message)?"Dieser Name ist schon vergeben. Nimm einen anderen.":error.message;return}
+  if(mode==="reg"&&!data.session){m.textContent="Konto angelegt. Bitte melde dich jetzt an.";return}
   $("dlg").close();
 };
 
