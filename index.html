@@ -230,14 +230,15 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
 const SUPABASE_URL = "https://woifnccfwcssowazgufz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_oaT509JxxyUvS0LQ11A46g_4gda1IgO";
 // ================================================================
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 const $ = id => document.getElementById(id);
 const SEG = ["Gratis Cola","Leider nichts","Gratis Pommes","10% Rabatt","Leider nichts","Gratis Wings","Leider nichts","Gratis Smart Menü"];
 let me = null, mode = "login", rot = 0, spinning = false;
 
 function el(tag, text, cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e}
 const fmt = d => new Date(d).toLocaleDateString("de-DE");
-const errText = e => ({already_spun:"Heute hast du schon gedreht. Komm morgen wieder!",not_logged_in:"Bitte melde dich zuerst an.",customer_not_found:"Kunden-ID nicht gefunden.",forbidden:"Dafür fehlt die Berechtigung."}[e?.message] || "Etwas ist schiefgelaufen: " + (e?.message||e));
+const ERR={already_spun:"Heute hast du schon gedreht. Komm morgen wieder!",not_logged_in:"Bitte melde dich zuerst an.",customer_not_found:"Kunden-ID nicht gefunden.",forbidden:"Dafür fehlt die Berechtigung.",invalid_login:"Name oder Passwort falsch.",name_taken:"Dieser Name ist schon vergeben. Nimm einen anderen.",invalid_name:"Der Name muss 3 bis 40 Zeichen lang sein.",weak_password:"Das Passwort braucht mindestens 8 Zeichen.",too_many_attempts:"Zu viele Versuche. Bitte warte 15 Minuten."};
+const errText = e => ERR[e?.message] || "Etwas ist schiefgelaufen: " + (e?.message||e);
 
 // ---- Glücksrad zeichnen ----
 (function drawWheel(){
@@ -292,9 +293,10 @@ document.querySelectorAll("[data-legal]").forEach(b=>b.onclick=()=>$(b.dataset.l
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 $("teamLogin").onclick=()=>{if(!me)openAuth("login");else if(isStaff())location.hash="#team";else alert("Dein Konto hat keinen Mitarbeiterzugang.")};
 
-// ---- Auth (Login per Name, intern als Pseudo-E-Mail) ----
-const LOGIN_DOMAIN = "burgerhaus-kunden.de"; // Nur intern für Supabase, es werden keine Mails verschickt
-const toEmail = n => { const u=n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,".").replace(/^\.+|\.+$/g,""); return u?u+"@"+LOGIN_DOMAIN:""; };
+// ---- Anmeldung: Name + Passwort, läuft über SQL-Funktionen (keine E-Mail) ----
+const getTok=()=>{try{return localStorage.getItem("bh_token")}catch{return null}};
+const setTok=t=>{try{t?localStorage.setItem("bh_token",t):localStorage.removeItem("bh_token")}catch{}};
+async function rpc(fn,args){const {data,error}=await db.rpc(fn,args);if(error)throw error;if(data&&data.error)throw new Error(data.error);return data}
 function setMode(m){mode=m;
   $("tLogin").className="btn"+(m==="login"?"":" o");$("tReg").className="btn"+(m==="reg"?"":" o");
   $("authGo").textContent=m==="login"?"Anmelden":"Konto anlegen";
@@ -302,28 +304,23 @@ function setMode(m){mode=m;
 $("tLogin").onclick=()=>setMode("login");$("tReg").onclick=()=>setMode("reg");
 $("closeDlg").onclick=()=>$("dlg").close();
 function openAuth(m){setMode(m||"login");$("dlg").showModal()}
-$("authBtn").onclick=async()=>{ if(me){await db.auth.signOut()} else openAuth("login") };
+$("authBtn").onclick=async()=>{ if(me){try{await rpc("logout",{p_token:getTok()})}catch{} setTok(null);me=null;render();$("myPrizes").replaceChildren();$("custList").replaceChildren()} else openAuth("login") };
 document.querySelectorAll("[data-auth]").forEach(b=>b.onclick=()=>me?location.hash="#konto":openAuth("reg"));
 
 $("authForm").onsubmit=async e=>{
   e.preventDefault();const m=$("authMsg");m.className="msg";m.textContent="Bitte warten …";
-  const email=toEmail($("nm").value),password=$("pw").value;
-  if(!email){m.className="msg err";m.textContent="Bitte gib einen Namen mit Buchstaben oder Zahlen ein.";return}
-  const {data,error}=mode==="login"
-    ? await db.auth.signInWithPassword({email,password})
-    : await db.auth.signUp({email,password,options:{data:{name:$("nm").value.trim()}}});
-  if(error){m.className="msg err";m.textContent=/invalid login/i.test(error.message)?"Name oder Passwort falsch.":/already|registered/i.test(error.message)?"Dieser Name ist schon vergeben. Nimm einen anderen.":error.message;return}
-  if(mode==="reg"&&!data.session){m.textContent="Konto angelegt. Bitte melde dich jetzt an.";return}
-  $("dlg").close();
+  try{
+    const d=await rpc(mode==="login"?"login":"register",{p_name:$("nm").value,p_password:$("pw").value});
+    setTok(d.token);$("pw").value="";$("dlg").close();await refresh();
+  }catch(err){m.className="msg err";m.textContent=errText(err)}
 };
 
 // ---- Daten laden & anzeigen ----
 async function refresh(){
-  const {data:{session}}=await db.auth.getSession();
-  if(!session){me=null;render();return}
-  const {data,error}=await db.from("profiles").select("*").eq("id",session.user.id).single();
-  me=error?null:data;render();
-  if(me){await loadPrizes();if(isStaff())searchCustomers()}
+  const t=getTok();
+  if(!t){me=null;render();return}
+  try{const d=await rpc("get_me",{p_token:t});me=d.profile;render();showPrizes(d.prizes);if(isStaff())searchCustomers()}
+  catch(e){setTok(null);me=null;render()}
 }
 const isStaff=()=>me&&["staff","admin"].includes(me.role);
 
@@ -339,19 +336,19 @@ function render(){
   $("spinBtn").disabled=false;$("spinMsg").textContent="";
 }
 
-async function loadPrizes(){
-  const {data,error}=await db.from("prizes").select("*").eq("user_id",me.id).order("created_at",{ascending:false});
+function showPrizes(data){
   const ul=$("myPrizes");ul.replaceChildren();
-  if(error||!data.length){ul.append(el("li","Noch keine Gewinne. Dreh am Glücksrad!"));return}
+  if(!data.length){ul.append(el("li","Noch keine Gewinne. Dreh am Glücksrad!"));return}
   data.forEach(p=>{const li=el("li");
     li.append(el("span",`${p.label} · ${fmt(p.created_at)}`),el("span",p.redeemed?"Eingelöst":"Offen","tag"+(p.redeemed?" done":"")));ul.append(li)});
 }
+const loadPrizes=refresh;
 
 // ---- Drehen (Ergebnis kommt vom Server) ----
 $("spinBtn").onclick=async()=>{
   if(!me){openAuth("login");return}
   if(spinning)return;spinning=true;$("spinBtn").disabled=true;$("spinMsg").className="msg";$("spinMsg").textContent="";
-  const {data:label,error}=await db.rpc("spin_wheel");
+  let label,error;try{label=await rpc("spin_wheel",{p_token:getTok()})}catch(e){error=e}
   if(error){spinning=false;$("spinBtn").disabled=false;$("spinMsg").className="msg err";$("spinMsg").textContent=errText(error);return}
   const idx=SEG.map((s,i)=>s===label?i:-1).filter(i=>i>=0);const i=idx[Math.floor(Math.random()*idx.length)];
   const a=360/SEG.length,target=(360-(i+.5)*a-(rot%360)+360)%360;
@@ -366,17 +363,16 @@ $("spinBtn").onclick=async()=>{
 // ---- Mitarbeiter ----
 let t;$("q").oninput=()=>{clearTimeout(t);t=setTimeout(searchCustomers,300)};
 async function searchCustomers(){
-  const term=$("q").value.trim().replace(/[,%()]/g,"");
-  let q=db.from("profiles").select("id,name,customer_id,stamps,prizes(id,label,redeemed,created_at)").order("created_at",{ascending:false}).limit(25);
-  if(term)q=q.or(`name.ilike.%${term}%,customer_id.ilike.%${term}%`);
-  const {data,error}=await q;const box=$("custList");box.replaceChildren();
+  let data,error;
+  try{data=await rpc("staff_search",{p_token:getTok(),p_q:$("q").value})}catch(e){error=e}
+  const box=$("custList");box.replaceChildren();
   if(error){$("teamMsg").className="msg err";$("teamMsg").textContent=errText(error);return}
   if(!data.length)box.append(el("p","Keine Kunden gefunden."));
   data.forEach(c=>{
     const d=el("div",null,"cust");
     d.append(el("h3",c.name||"Ohne Name"),el("small",`${c.customer_id} · ${c.stamps} Stempel`));
     const row=el("div",null,"row");const b=el("button","+1 Stempel","btn c");
-    b.onclick=async()=>{b.disabled=true;const {error}=await db.rpc("add_stamp",{p_customer_id:c.customer_id});
+    b.onclick=async()=>{b.disabled=true;let error;try{await rpc("add_stamp",{p_token:getTok(),p_customer_id:c.customer_id})}catch(e){error=e}
       $("teamMsg").className=error?"msg err":"msg";$("teamMsg").textContent=error?errText(error):`Stempel für ${c.name||c.customer_id} gebucht.`;searchCustomers()};
     row.append(b);d.append(row);
     const ul=el("ul",null,"list");
@@ -384,13 +380,12 @@ async function searchCustomers(){
       const li=el("li");li.append(el("span",`${p.label} · ${fmt(p.created_at)}`));
       if(p.redeemed)li.append(el("span","Eingelöst","tag done"));
       else{const r=el("button","Einlösen","btn o");r.onclick=async()=>{r.disabled=true;
-        const {error}=await db.rpc("redeem_prize",{p_id:p.id});if(error){$("teamMsg").className="msg err";$("teamMsg").textContent=errText(error)}searchCustomers()};li.append(r)}
+        let error;try{await rpc("redeem_prize",{p_token:getTok(),p_id:p.id})}catch(e){error=e}if(error){$("teamMsg").className="msg err";$("teamMsg").textContent=errText(error)}searchCustomers()};li.append(r)}
       ul.append(li)});
     d.append(ul);box.append(d);
   });
 }
 
-db.auth.onAuthStateChange(()=>setTimeout(refresh,0));
 refresh();
 </script>
 </body>
