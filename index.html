@@ -37,8 +37,8 @@ section{max-width:1200px;margin:auto;padding:4.5rem 1.2rem}
 .stamp{aspect-ratio:1;border-radius:16px;border:1px dashed var(--line);display:grid;place-items:center;font-size:1.6rem;filter:grayscale(1) opacity(.25)}
 .stamp.on{border:1px solid var(--pink);background:#ff2d8f33;filter:none;box-shadow:0 0 16px #ff2d8f55}
 .wheelbox{position:relative;width:min(420px,100%);margin:auto}
-.wheelbox canvas{width:100%;height:auto;display:block;transition:transform 5s cubic-bezier(.12,.7,.1,1)}
-.pointer{position:absolute;top:-10px;left:50%;transform:translateX(-50%);border:14px solid transparent;border-top:28px solid var(--cyan);filter:drop-shadow(0 0 8px var(--cyan));z-index:2}
+.wheelbox canvas{width:100%;height:auto;display:block;will-change:transform}
+.pointer{transform-origin:50% 0;position:absolute;top:-10px;left:50%;transform:translateX(-50%);border:14px solid transparent;border-top:28px solid var(--cyan);filter:drop-shadow(0 0 8px var(--cyan));z-index:2}
 .list{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.6rem}
 .list li{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:14px}
 .tag{font-size:.7rem;padding:.2rem .7rem;border-radius:99px;border:1px solid var(--cyan);color:var(--cyan)}
@@ -75,7 +75,9 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
 .fgrid a:hover,.fgrid button.lk:hover{color:var(--text)}
 @media(max-width:800px){.fgrid{grid-template-columns:1fr 1fr}}
 @media(max-width:800px){.hero,.two{grid-template-columns:1fr}nav a.l{display:none}.hero .ph{aspect-ratio:16/9}}
-@media(prefers-reduced-motion:reduce){.wheelbox canvas{transition-duration:.01s}html{scroll-behavior:auto}}
+@keyframes glow{50%{filter:drop-shadow(0 0 28px #00e5ff) drop-shadow(0 0 40px #ff2d8f)}}
+.wheelbox.win{animation:glow .9s ease-in-out 3}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.wheelbox.win{animation:none}}
 </style>
 </head>
 <body>
@@ -128,7 +130,7 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
   <div>
     <h2>Dreh das <span class="cyan">Glücksrad</span></h2>
     <p style="color:var(--muted)">Einmal pro Tag drehen. Dein Gewinn landet sofort in deinem Konto, zeig ihn an der Kasse vor.</p>
-    <div class="row"><button class="btn c" id="spinBtn">Jetzt drehen</button></div>
+    <div class="row"><button class="btn c" id="spinBtn">Jetzt drehen</button><button class="btn o" id="sndBtn" type="button" aria-pressed="true">Ton an</button></div>
     <p class="msg" id="spinMsg" role="status"></p>
   </div>
 </section>
@@ -345,19 +347,56 @@ function showPrizes(data){
 const loadPrizes=refresh;
 
 // ---- Drehen (Ergebnis kommt vom Server) ----
+// ---- Glücksrad-Animation: Anlauf, Dauerdrehen bis das Ergebnis da ist, dann auslaufen mit Klick-Ton und Zeiger ----
+const wheel=$("wheel"),pointer=document.querySelector(".pointer"),SA=360/SEG.length,CRUISE=1000;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let ang=0,vel=0,phase="idle",tw=null,pa=0,lastK=0,lastT=0,audio=null,soundOn=true,lastTick=0;
+function click(){
+  if(!soundOn||!audio)return;const t=audio.currentTime;if(t-lastTick<.03)return;lastTick=t;
+  const o=audio.createOscillator(),g=audio.createGain();o.type="square";o.frequency.value=850+Math.random()*150;
+  g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.001,t+.04);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.05);
+}
+function jingle(){
+  if(!soundOn||!audio)return;[660,830,990].forEach((f,n)=>{const t=audio.currentTime+n*.12,o=audio.createOscillator(),g=audio.createGain();
+    o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.32)});
+}
+function loop(now){
+  const dt=Math.min(.05,(now-lastT)/1000||0);lastT=now;
+  if(phase==="spin"){vel=Math.min(CRUISE,vel+CRUISE*2.2*dt);ang+=vel*dt}
+  else if(phase==="land"){
+    const p=Math.min(1,(now-tw.t0)/tw.dur),na=tw.a0+tw.dist*(1-Math.pow(1-p,3));
+    vel=dt?(na-ang)/dt:0;ang=na;if(p>=1){phase="idle";vel=0;tw.done()}
+  }
+  wheel.style.transform=`rotate(${ang}deg)`;
+  const k=Math.floor(ang/SA);if(k!==lastK){lastK=k;pa=Math.min(26,9+vel/55);click()}
+  pa*=Math.exp(-dt*16);pointer.style.transform=`translateX(-50%) rotate(${pa}deg)`;
+  if(phase!=="idle"||pa>.2)requestAnimationFrame(loop);else pointer.style.transform="translateX(-50%)";
+}
+function run(){lastT=performance.now();requestAnimationFrame(loop)}
+function land(dist,dur,done){tw={a0:ang,dist,dur:reduce?Math.min(dur,1000):dur,t0:performance.now(),done};phase="land"}
+$("sndBtn").onclick=()=>{soundOn=!soundOn;$("sndBtn").textContent=soundOn?"Ton an":"Ton aus";$("sndBtn").setAttribute("aria-pressed",soundOn)};
+
 $("spinBtn").onclick=async()=>{
   if(!me){openAuth("login");return}
   if(spinning)return;spinning=true;$("spinBtn").disabled=true;$("spinMsg").className="msg";$("spinMsg").textContent="";
+  $("wheel").parentElement.classList.remove("win");
+  try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();audio.resume()}catch{}
+  phase="spin";run();
   let label,error;try{label=await rpc("spin_wheel",{p_token:getTok()})}catch(e){error=e}
-  if(error){spinning=false;$("spinBtn").disabled=false;$("spinMsg").className="msg err";$("spinMsg").textContent=errText(error);return}
-  const idx=SEG.map((s,i)=>s===label?i:-1).filter(i=>i>=0);const i=idx[Math.floor(Math.random()*idx.length)];
-  const a=360/SEG.length,target=(360-(i+.5)*a-(rot%360)+360)%360;
-  rot+=360*5+target;$("wheel").style.transform=`rotate(${rot}deg)`;
-  setTimeout(async()=>{
-    spinning=false;
-    $("spinMsg").textContent=label==="Leider nichts"?"Leider nichts gewonnen. Morgen gibt es einen neuen Versuch!":`Gewonnen: ${label}! Du findest den Gewinn in deinem Konto.`;
-    await loadPrizes();if(isStaff())searchCustomers();
-  },5200);
+  if(error){
+    land(vel*1.2/3,1200,()=>{spinning=false;$("spinBtn").disabled=false});
+    $("spinMsg").className="msg err";$("spinMsg").textContent=errText(error);return;
+  }
+  const idx=SEG.map((s,i)=>s===label?i:-1).filter(i=>i>=0),i=idx[Math.floor(Math.random()*idx.length)];
+  const off=(Math.random()-.5)*.7,target=((360-(i+.5+off)*SA)%360+360)%360;
+  const need=((target-ang)%360+360)%360,dur=5200;
+  const dist=need+360*Math.max(3,Math.round((vel*dur/1000/3-need)/360));
+  land(dist,dur,async()=>{
+    const win=label!=="Leider nichts";
+    await loadPrizes();spinning=false;
+    $("spinMsg").textContent=win?`Gewonnen: ${label}! Du findest den Gewinn in deinem Konto.`:"Leider nichts gewonnen. Morgen gibt es einen neuen Versuch!";
+    if(win){$("wheel").parentElement.classList.add("win");jingle()}
+  });
 };
 
 // ---- Mitarbeiter ----
