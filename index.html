@@ -421,8 +421,13 @@ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("di
 $("teamLogin").onclick=()=>{if(!me)openAuth("login");else if(isStaff())location.hash="#team";else alert("Dein Konto hat keinen Mitarbeiterzugang.")};
 
 // ---- Anmeldung: Name + Passwort, läuft über SQL-Funktionen (keine E-Mail) ----
-const getTok=()=>{try{return localStorage.getItem("bh_token")}catch{return null}};
-const setTok=t=>{try{t?localStorage.setItem("bh_token",t):localStorage.removeItem("bh_token")}catch{}};
+// Jeder Tab behält sein eigenes Login (sessionStorage). localStorage dient nur dazu, neue Tabs automatisch anzumelden.
+let tok=null;
+try{tok=sessionStorage.getItem("bh_token")||localStorage.getItem("bh_token");if(tok)sessionStorage.setItem("bh_token",tok)}catch{}
+const getTok=()=>tok;
+const setTok=t=>{const old=tok;tok=t||null;
+  try{if(t){sessionStorage.setItem("bh_token",t);localStorage.setItem("bh_token",t)}
+      else{sessionStorage.removeItem("bh_token");if(localStorage.getItem("bh_token")===old)localStorage.removeItem("bh_token")}}catch{}};
 async function rpc(fn,args){const {data,error}=await db.rpc(fn,args);if(error)throw error;if(data&&data.error)throw new Error(data.error);return data}
 function setMode(m){mode=m;
   $("tLogin").className="btn"+(m==="login"?"":" o");$("tReg").className="btn"+(m==="reg"?"":" o");
@@ -553,6 +558,19 @@ async function searchCustomers(){
     d.append(ul);box.append(d);
   });
 }
+
+// Stempel und Gewinne automatisch aktualisieren (alle 15 Sekunden und beim Zurückkehren auf die Seite)
+function paintStamps(){
+  const g=$("stamps");g.replaceChildren();
+  for(let i=0;i<10;i++)g.append(el("div","🍔","stamp"+(me&&i<me.stamps?" on":"")));
+  $("cardInfo").textContent=me?`${me.stamps} von 10 Stempeln · Kunden-ID: ${me.customer_id}`:"10 Stempel = 1x Smart Menü gratis";
+}
+async function sync(){
+  const t=getTok();if(!t||!me||spinning)return;
+  try{const d=await rpc("get_me",{p_token:t});me=d.profile;paintStamps();showPrizes(d.prizes)}catch{}
+}
+setInterval(()=>{if(document.visibilityState==="visible")sync()},15000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sync()});
 
 refresh();
 loadMenu();
