@@ -51,6 +51,12 @@ header.solid{background:#07050df0;backdrop-filter:blur(12px);box-shadow:0 1px 0 
 .burger{display:none;background:#ffffff0d;border:1px solid var(--line);border-radius:12px;width:44px;height:44px;cursor:pointer;flex-direction:column;justify-content:center;gap:5px;align-items:center}
 .burger span{width:20px;height:2px;background:#fff;display:block}
 
+.acct{position:absolute;top:calc(100% + 6px);right:max(1.2rem,calc((100vw - 1240px)/2 + 1.2rem));min-width:230px;background:#0f0b19;border:1px solid var(--pink);border-radius:16px;padding:.6rem;box-shadow:0 20px 50px #000c;display:flex;flex-direction:column;gap:.2rem}
+.acct.hide{display:none!important}
+.acct-h{font:600 .65rem Poppins;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding:.4rem .7rem}
+.acct-i{background:none;border:0;color:var(--text);font:inherit;text-align:left;padding:.65rem .8rem;border-radius:10px;cursor:pointer}
+.acct-i:hover{background:#ffffff10}.acct-i.on{color:var(--cyan)}.acct-i.add{color:var(--gold)}.acct-i.out{color:#ff7a9c;border-top:1px solid var(--line);margin-top:.3rem;border-radius:0 0 10px 10px}
+
 /* Hero */
 .hero-banner{position:relative}
 .hero-banner img{width:100%;height:clamp(300px,50vw,620px);object-fit:cover;object-position:center;display:block}
@@ -182,7 +188,8 @@ main>.sec,.wheel-sec>.sec{padding-top:8rem}
   </div>
   <button class="btn sm" id="authBtn">Anmelden</button>
   <button class="burger" id="burger" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="links"><span></span><span></span><span></span></button>
-</nav></header>
+</nav>
+<div class="acct hide" id="acctMenu" role="menu"></div></header>
 
 <main id="top">
 <section class="hero-banner" data-view="home"><img src="https://verblasst-mythos.github.io/Burger-Haus/banner.jpg" alt="BURGERHAUS Banner mit goldenem Burger-Wappen, Burgern und Flammen"></section>
@@ -294,7 +301,7 @@ main>.sec,.wheel-sec>.sec{padding-top:8rem}
     <div><h4>RESTAURANT</h4><a href="#ueber">Über uns</a><a href="#kontakt">Kontakt</a><button class="lk" data-legal="impressum">Impressum</button><button class="lk" data-legal="datenschutz">Datenschutz</button></div>
     <div><h4>TEAM-LOGIN</h4><button class="lk" id="teamLogin">Mitarbeiterbereich</button></div>
   </div>
-  <div><span>© 2026 BURGERHAUS · Inhaber Cano Yilmaz · Version 25.11-b</span><span>Dein Burger. Dein Geschmack. Dein BURGERHAUS.</span></div>
+  <div><span>© 2026 BURGERHAUS · Inhaber Cano Yilmaz · Version 25.11-e</span><span>Dein Burger. Dein Geschmack. Dein BURGERHAUS.</span></div>
 </footer>
 
 <dialog id="cardDlg" class="legal">
@@ -324,7 +331,7 @@ main>.sec,.wheel-sec>.sec{padding-top:8rem}
   <h3>Hosting und technische Dienste</h3>
   <p>Die Kontodaten werden bei Supabase gespeichert. Die Seite wird über [Hosting-Anbieter, z. B. Cloudflare] ausgeliefert, dabei werden technisch notwendige Verbindungsdaten wie die IP-Adresse verarbeitet. Skripte laden wir vom CDN jsDelivr, Schriftarten von Google Fonts. [Wenn möglich: Schriften lokal einbinden.]</p>
   <h3>Cookies und lokale Speicherung</h3>
-  <p>Die Anmeldung speichert ein Sitzungs-Token im lokalen Speicher deines Browsers. Es ist für den Login technisch notwendig. Tracking- oder Werbe-Cookies setzen wir nicht ein.</p>
+  <p>Die Anmeldung speichert ein Sitzungs-Token im Sitzungsspeicher (sessionStorage) des jeweiligen Browser-Tabs. Es wird beim Schließen des Tabs gelöscht und ist für den Login technisch notwendig. Tracking- oder Werbe-Cookies setzen wir nicht ein.</p>
   <h3>Deine Rechte</h3>
   <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Außerdem kannst du dich bei der zuständigen Datenschutzaufsichtsbehörde beschweren.</p>
   <div class="row"><button class="btn o" data-close>Schließen</button></div>
@@ -442,13 +449,26 @@ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("di
 $("teamLogin").onclick=()=>{if(!me)openAuth("login");else if(isStaff())location.hash="#team";else alert("Dein Konto hat keinen Mitarbeiterzugang.")};
 
 // ---- Anmeldung: Name + Passwort, läuft über SQL-Funktionen (keine E-Mail) ----
-// Jeder Tab behält sein eigenes Login (sessionStorage). localStorage dient nur dazu, neue Tabs automatisch anzumelden.
-let tok=null;
-try{tok=sessionStorage.getItem("bh_token")||localStorage.getItem("bh_token");if(tok)sessionStorage.setItem("bh_token",tok)}catch{}
+// Anmeldung pro Tab: sessionStorage gehört nur zu diesem einen Tab und überlebt Neuladen (F5 / Strg+F5).
+// Wichtig: NICHT localStorage verwenden, das teilen sich alle Tabs, dann würde ein Tab das Konto des anderen übernehmen.
+// Mehrere Konten können im selben Tab angemeldet bleiben und über das Kontomenü gewechselt werden.
+const SK="bh_tab_session";
+let tok=null,ACC=[];
+function saveSess(){try{sessionStorage.setItem(SK,JSON.stringify({a:ACC,t:tok}))}catch{}}
+(function loadSess(){
+  try{
+    const s=JSON.parse(sessionStorage.getItem(SK)||"null");
+    if(s&&Array.isArray(s.a)){
+      ACC=s.a.filter(x=>x&&typeof x.n==="string"&&typeof x.t==="string");
+      tok=ACC.some(x=>x.t===s.t)?s.t:(ACC[0]?ACC[0].t:null);
+    }
+  }catch{}
+})();
 const getTok=()=>tok;
-const setTok=t=>{const old=tok;tok=t||null;
-  try{if(t){sessionStorage.setItem("bh_token",t);localStorage.setItem("bh_token",t)}
-      else{sessionStorage.removeItem("bh_token");if(localStorage.getItem("bh_token")===old)localStorage.removeItem("bh_token")}}catch{}};
+const accts=()=>ACC;
+function useTok(t){tok=t||null;saveSess()}
+function addAcct(name,t){ACC=ACC.filter(x=>x.t!==t&&x.n.toLowerCase()!==name.toLowerCase()).concat({n:name,t});useTok(t)}
+function dropAcct(t){ACC=ACC.filter(x=>x.t!==t);saveSess()}
 async function rpc(fn,args){const {data,error}=await db.rpc(fn,args);if(error)throw error;if(data&&data.error)throw new Error(data.error);return data}
 function setMode(m){mode=m;
   $("tLogin").className="btn"+(m==="login"?"":" o");$("tReg").className="btn"+(m==="reg"?"":" o");
@@ -457,14 +477,26 @@ function setMode(m){mode=m;
 $("tLogin").onclick=()=>setMode("login");$("tReg").onclick=()=>setMode("reg");
 $("closeDlg").onclick=()=>$("dlg").close();
 function openAuth(m){setMode(m||"login");$("dlg").showModal()}
-$("authBtn").onclick=async()=>{ if(me){try{await rpc("logout",{p_token:getTok()})}catch{} setTok(null);me=null;render();$("myPrizes").replaceChildren();$("custList").replaceChildren()} else openAuth("login") };
+function closeMenu(){$("acctMenu").classList.add("hide");$("authBtn").setAttribute("aria-expanded","false")}
+function openMenu(){
+  const m=$("acctMenu");m.replaceChildren();
+  m.append(el("div","Angemeldete Konten","acct-h"));
+  accts().forEach(a=>{const b=el("button",(a.t===tok?"✓ ":"")+a.n,"acct-i"+(a.t===tok?" on":""));b.type="button";
+    b.onclick=async()=>{closeMenu();if(a.t!==tok){useTok(a.t);await refresh();location.hash="#home"}};m.append(b)});
+  const add=el("button","+ Weiteres Konto anmelden","acct-i add");add.type="button";add.onclick=()=>{closeMenu();openAuth("login")};m.append(add);
+  const out=el("button","Abmelden: "+(me?me.name:""),"acct-i out");out.type="button";
+  out.onclick=async()=>{closeMenu();const t=tok;try{await rpc("logout",{p_token:t})}catch{}dropAcct(t);const n=accts()[0];useTok(n?n.t:null);me=null;render();$("myPrizes").replaceChildren();$("custList").replaceChildren();await refresh()};
+  m.append(out);m.classList.remove("hide");$("authBtn").setAttribute("aria-expanded","true");
+}
+$("authBtn").onclick=e=>{e.stopPropagation();if(!me){openAuth("login");return}$("acctMenu").classList.contains("hide")?openMenu():closeMenu()};
+document.addEventListener("click",e=>{if(!e.target.closest("#acctMenu"))closeMenu()});
 document.querySelectorAll("[data-auth]").forEach(b=>b.onclick=()=>me?location.hash="#konto":openAuth("reg"));
 
 $("authForm").onsubmit=async e=>{
   e.preventDefault();const m=$("authMsg");m.className="msg";m.textContent="Bitte warten …";
   try{
     const d=await rpc(mode==="login"?"login":"register",{p_name:$("nm").value,p_password:$("pw").value});
-    setTok(d.token);$("pw").value="";$("dlg").close();await refresh();
+    addAcct(d.profile.name,d.token);$("pw").value="";$("dlg").close();await refresh();
   }catch(err){m.className="msg err";m.textContent=errText(err)}
 };
 
@@ -473,12 +505,18 @@ async function refresh(){
   const t=getTok();
   if(!t){me=null;render();return}
   try{const d=await rpc("get_me",{p_token:t});me=d.profile;render();showPrizes(d.prizes);if(isStaff()){searchCustomers();renderEditor()}}
-  catch(e){setTok(null);me=null;render()}
+  catch(e){
+    if(e&&e.message==="not_logged_in"){
+      dropAcct(t);useTok((accts()[0]||{}).t||null);
+      if(tok){return refresh()}   // abgelaufenes Konto entfernt, nächstes gespeichertes Konto probieren
+    }
+    me=null;render()
+  }
 }
 const isStaff=()=>me&&["staff","admin"].includes(me.role);
 
 function render(){
-  $("authBtn").textContent=me?"Abmelden":"Anmelden";
+  $("authBtn").textContent=me?(me.name.length>14?me.name.slice(0,13)+"…":me.name)+" ▾":"Anmelden";
   ["konto"].forEach(i=>$(i).classList.toggle("hide",!me));$("navAcc").classList.toggle("hide",!me);
   $("team").classList.toggle("hide",!isStaff());$("navStaff").classList.toggle("hide",!isStaff());
   const s=$("stamps");s.replaceChildren();
