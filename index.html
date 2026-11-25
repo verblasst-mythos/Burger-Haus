@@ -362,7 +362,7 @@ let me = null, mode = "login", rot = 0, spinning = false;
 
 function el(tag, text, cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e}
 const fmt = d => new Date(d).toLocaleDateString("de-DE");
-const ERR={already_spun:"Heute hast du schon gedreht. Komm morgen wieder!",not_logged_in:"Bitte melde dich zuerst an.",customer_not_found:"Kunden-ID nicht gefunden.",forbidden:"Dafür fehlt die Berechtigung.",invalid_login:"Name oder Passwort falsch.",name_taken:"Dieser Name ist schon vergeben. Nimm einen anderen.",invalid_input:"Bitte Kategorie, Name und Preis ausfüllen.",invalid_name:"Der Name muss 3 bis 40 Zeichen lang sein.",weak_password:"Das Passwort braucht mindestens 8 Zeichen.",too_many_attempts:"Zu viele Versuche. Bitte warte 15 Minuten."};
+const ERR={already_spun:"Heute hast du schon gedreht. Komm morgen wieder!",not_logged_in:"Bitte melde dich zuerst an.",customer_not_found:"Kunden-ID nicht gefunden.",forbidden:"Dafür fehlt die Berechtigung.",invalid_login:"Name oder Passwort falsch.",name_taken:"Dieser Name ist schon vergeben. Nimm einen anderen.",invalid_input:"Bitte Kategorie, Name und Preis ausfüllen.",invalid_name:"Der Name muss 3 bis 40 Zeichen lang sein.",weak_password:"Das Passwort braucht mindestens 8 Zeichen.",too_many_attempts:"Zu viele Versuche. Bitte warte 15 Minuten.",prize_not_found:"Gewinn nicht gefunden oder schon eingelöst.",not_found:"Eintrag nicht gefunden.",register_failed:"Registrierung fehlgeschlagen. Bitte nochmal versuchen."};
 const todayDE=()=>new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Berlin"});
 const errText = e => ERR[e?.message] || "Etwas ist schiefgelaufen: " + (e?.message||e);
 
@@ -415,8 +415,9 @@ function renderMenu(){
   cats.forEach(k=>{const b=el("button",k,"btn"+(k===curCat?"":" o"));b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",k===curCat);b.onclick=()=>{curCat=k;renderMenu()};bar.append(b)});
   const g=$("menuGrid");g.replaceChildren();items.filter(x=>x.kind==="item"&&x.category===curCat).forEach(x=>g.append(card(x)));
   const cg=$("comboGrid");cg.replaceChildren();items.filter(x=>x.kind==="combo").forEach(x=>cg.append(card(x,"combo")));
+  if(!items.length)g.append(el("p","Die Speisekarte wird gerade aktualisiert.","muted"));
 }
-async function loadMenu(){try{const d=await rpc("menu_list");items=d.length?d:FALLBACK}catch{items=FALLBACK}renderMenu();if(isStaff())renderEditor()}
+async function loadMenu(){try{const d=await rpc("menu_list");items=Array.isArray(d)?d:FALLBACK}catch{items=FALLBACK}renderMenu();if(isStaff())renderEditor()}
 
 function renderEditor(){
   const box=$("menuRows");box.replaceChildren();
