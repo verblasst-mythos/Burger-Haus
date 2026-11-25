@@ -2,192 +2,268 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="BURGERHAUS Köln: handgemachte Smash Burger, Wings und Drinks im Neon-Diner. Bonus Card und tägliches Glücksrad.">
+<meta name="theme-color" content="#07050d">
 <title>BURGERHAUS · Köln Smash Burger</title>
 <link rel="icon" href="https://verblasst-mythos.github.io/Burger-Haus/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add("js")</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-:root{--bg:#07050d;--panel:#100c1a;--pink:#ff2d8f;--cyan:#00e5ff;--text:#f4f0fa;--muted:#a99fbd;--line:#2a2140}
+:root{--bg:#07050d;--panel:#110d1c;--pink:#ff2d8f;--cyan:#00e5ff;--gold:#f6c453;--text:#f6f2fc;--muted:#b4aac8;--line:#ffffff17;--r:22px}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:90px}
-body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 Poppins,system-ui,sans-serif}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;color:var(--text);font:400 16px/1.65 Poppins,system-ui,sans-serif;background:radial-gradient(900px 520px at 12% -4%,#ff2d8f1f,transparent 60%),radial-gradient(800px 500px at 100% 8%,#00e5ff14,transparent 60%),var(--bg);background-attachment:fixed}
 h1,h2,h3{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;letter-spacing:.02em;line-height:1;margin:0}
-h1{font-size:clamp(3rem,8vw,5.5rem)}h2{font-size:clamp(2.2rem,5vw,3.4rem)}
-.pink{color:var(--pink);text-shadow:0 0 18px #ff2d8f88}.cyan{color:var(--cyan);text-shadow:0 0 18px #00e5ff77}
-header{position:sticky;top:0;z-index:20;background:#07050dee;backdrop-filter:blur(8px)}
-header::after{content:"";display:block;height:14px;background:repeating-conic-gradient(#ff2d8f 0 25%,#1a0a1f 0 50%) 0 0/14px 14px;opacity:.7}
-nav{display:flex;align-items:center;gap:1.5rem;max-width:1200px;margin:auto;padding:.7rem 1.2rem}
-.logo{font-family:'Bebas Neue';font-size:2rem;color:#fff;text-shadow:0 0 14px var(--pink);text-decoration:none;margin-right:auto}
-nav a.l{color:var(--text);text-decoration:none;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase}
-nav a.l:hover{color:var(--cyan)}
-.btn{font:600 .8rem Poppins;letter-spacing:.12em;text-transform:uppercase;border:0;border-radius:99px;padding:.8rem 1.4rem;cursor:pointer;background:var(--pink);color:#fff;box-shadow:0 0 22px #ff2d8f66;text-decoration:none;display:inline-block}
-.btn.c{background:var(--cyan);color:#001a1f;box-shadow:0 0 22px #00e5ff55}
-.btn.o{background:transparent;color:var(--cyan);border:1px solid #00e5ff66;box-shadow:none}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
-section{max-width:1200px;margin:auto;padding:4.5rem 1.2rem}
-.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;min-height:70vh}
-.hero p{color:var(--muted);max-width:46ch}
-.hero .ph{display:none;aspect-ratio:4/5;border-radius:28px;background:radial-gradient(circle at 30% 20%,#ff2d8f55,transparent 55%),radial-gradient(circle at 80% 80%,#00e5ff44,transparent 50%),var(--panel);border:1px solid var(--line);display:grid;place-items:center;font:5rem 'Bebas Neue';text-align:center;color:#fff;text-shadow:0 0 30px var(--pink)}
-.row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.6rem}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:1.6rem}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center}
-.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin:1rem 0}
-.stamp{aspect-ratio:1;border-radius:16px;border:1px dashed var(--line);display:grid;place-items:center;font-size:1.6rem;filter:grayscale(1) opacity(.25)}
-.stamp.on{border:1px solid var(--pink);background:#ff2d8f33;filter:none;box-shadow:0 0 16px #ff2d8f55}
-.wheelbox{position:relative;width:min(420px,100%);margin:auto}
-.wheelbox canvas{width:100%;height:auto;display:block;will-change:transform}
-.pointer{transform-origin:50% 0;position:absolute;top:-10px;left:50%;transform:translateX(-50%);border:14px solid transparent;border-top:28px solid var(--cyan);filter:drop-shadow(0 0 8px var(--cyan));z-index:2}
-.list{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.6rem}
-.list li{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:14px}
-.tag{font-size:.7rem;padding:.2rem .7rem;border-radius:99px;border:1px solid var(--cyan);color:var(--cyan)}
-.tag.done{border-color:var(--muted);color:var(--muted)}
-input,textarea,select{width:100%;font:inherit;background:#0b0813;border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;color:var(--text);font:inherit;margin:.3rem 0 .8rem}
-label{font-size:.8rem;color:var(--muted)}
-dialog{background:var(--panel);color:var(--text);border:1px solid var(--pink);border-radius:22px;padding:1.6rem;width:min(400px,92vw);box-shadow:0 0 50px #ff2d8f44}
-dialog::backdrop{background:#000a}
-.tabs{display:flex;gap:.5rem;margin-bottom:1rem}
-.msg{min-height:1.4em;font-size:.85rem;color:var(--cyan)}.msg.err{color:#ff7a9c}
+h1{font-size:clamp(3rem,8vw,6rem)}h2{font-size:clamp(2.5rem,5.5vw,4rem)}
+img{max-width:100%}
+.pink{color:var(--pink);text-shadow:0 0 22px #ff2d8f88}.cyan{color:var(--cyan);text-shadow:0 0 22px #00e5ff77}.gold{color:var(--gold)}
+.muted{color:var(--muted)}.center{text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:.7rem;font:600 .72rem Poppins;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan)}
+.eyebrow::before{content:"";width:34px;height:2px;background:var(--pink);box-shadow:0 0 10px var(--pink)}
+.lead{color:var(--muted);max-width:56ch;margin:1rem 0 0;font-size:1.05rem}
 .hide{display:none!important}
-#cust{border:1px solid var(--line);border-radius:18px;padding:1rem;margin-top:1rem}
-.cust{padding:1rem;border:1px solid var(--line);border-radius:16px;margin-top:.8rem}
-.cust h3{font-size:1.5rem}.cust small{color:var(--muted)}
-footer{border-top:1px solid var(--line);background:#0b0713;color:var(--muted);font-size:.85rem}
-footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.logo img{height:46px;width:auto;display:block}
-.hero-logo{width:100%;max-width:460px;margin:auto;display:block;filter:drop-shadow(0 0 40px #ff2d8f66)}
-.banner{padding-top:0;padding-bottom:0}.banner img{width:100%;display:block;border-radius:24px;border:1px solid var(--line)}
-.diner{width:100%;display:block;border-radius:20px;border:1px solid var(--line)}
-.erow{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}.erow label{display:block}.erow .row{grid-column:1/-1;margin-top:0}
-textarea{resize:vertical;min-height:4.5rem}
-.cats{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.4rem 0}
-.cats .btn{padding:.6rem 1.1rem}
-.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-.item{display:flex;flex-direction:column;gap:.3rem;padding:1.2rem 1.3rem;background:var(--panel);border:1px solid var(--line);border-radius:18px}
-.item .top{display:flex;justify-content:space-between;gap:1rem;align-items:baseline}
-.item h3{font-size:1.6rem}.item .pr{font:400 1.5rem 'Bebas Neue';color:var(--cyan)}
-.item p{white-space:pre-line;margin:0;color:var(--muted);font-size:.9rem}
-.combo{border-color:#ff2d8f88;box-shadow:0 0 30px #ff2d8f22}
-.note{color:var(--muted);font-size:.8rem;margin-top:1.2rem}
-.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1.4rem}
-.info h3{font-size:1.5rem;color:var(--cyan);margin-bottom:.4rem}.info p{margin:.2rem 0;color:var(--muted)}
-.info a{color:var(--text)}
-.legal{width:min(720px,94vw);max-height:86vh;overflow:auto}
-.legal h3{font-size:1.5rem;color:var(--cyan);margin:1.2rem 0 .3rem}.legal p{color:var(--muted);font-size:.9rem;margin:.3rem 0}
-.fgrid{max-width:1200px;margin:auto;padding:2.5rem 1.2rem 1rem;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:2rem}
-.fgrid h4{font:600 .7rem Poppins;letter-spacing:.2em;color:var(--cyan);margin:0 0 .8rem}
-.fgrid a,.fgrid button.lk{display:block;color:var(--muted);text-decoration:none;background:none;border:0;padding:.15rem 0;font:inherit;cursor:pointer;text-align:left}
-.fgrid a:hover,.fgrid button.lk:hover{color:var(--text)}
-@media(max-width:800px){.fgrid{grid-template-columns:1fr 1fr}}
-@media(max-width:800px){.hero,.two{grid-template-columns:1fr}nav a.l{display:none}.hero .ph{aspect-ratio:16/9}}
-@keyframes glow{50%{filter:drop-shadow(0 0 28px #00e5ff) drop-shadow(0 0 40px #ff2d8f)}}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* Buttons */
+.btn{font:600 .78rem Poppins;letter-spacing:.14em;text-transform:uppercase;border:0;border-radius:99px;padding:.95rem 1.7rem;cursor:pointer;background:linear-gradient(135deg,#ff2d8f,#ff5aa8);color:#fff;box-shadow:0 8px 28px #ff2d8f55;text-decoration:none;display:inline-block;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 34px #ff2d8f77}
+.btn.c{background:linear-gradient(135deg,#00e5ff,#5df0ff);color:#00181d;box-shadow:0 8px 28px #00e5ff44}
+.btn.c:hover{box-shadow:0 12px 34px #00e5ff66}
+.btn.o{background:#ffffff08;color:var(--cyan);border:1px solid #00e5ff55;box-shadow:none}
+.btn.o:hover{background:#00e5ff18;box-shadow:none}
+.btn.sm{padding:.7rem 1.3rem}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.8rem}.row.c{justify-content:center}
+
+/* Header */
+header{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s,box-shadow .3s}
+header.solid{background:#07050df0;backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line)}
+.nav{display:flex;align-items:center;gap:1.4rem;max-width:1240px;margin:auto;padding:.7rem 1.2rem}
+.brand{margin-right:auto;display:block}.brand img{height:52px;width:auto;display:block;filter:drop-shadow(0 0 12px #f6c45355)}
+.links{display:flex;gap:1.5rem}
+.links a{font:600 .74rem Poppins;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;color:var(--text);position:relative;padding:.3rem 0}
+.links a::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:0;background:var(--pink);box-shadow:0 0 8px var(--pink);transition:width .25s}
+.links a:hover::after{width:100%}
+.burger{display:none;background:#ffffff0d;border:1px solid var(--line);border-radius:12px;width:44px;height:44px;cursor:pointer;flex-direction:column;justify-content:center;gap:5px;align-items:center}
+.burger span{width:20px;height:2px;background:#fff;display:block}
+
+/* Hero */
+.hero-banner{position:relative}
+.hero-banner img{width:100%;height:clamp(300px,50vw,620px);object-fit:cover;object-position:center;display:block}
+.hero-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#07050d99 0,transparent 28%,transparent 55%,var(--bg) 100%)}
+.hero-in{position:relative;z-index:2;max-width:860px;margin:-4.5rem auto 0;padding:0 1.2rem 4rem;text-align:center}
+.hero-in h1{margin:1.1rem 0 1rem}
+.hero-in p{color:var(--muted);max-width:56ch;margin:0 auto;font-size:1.08rem}
+.marquee{overflow:hidden;border-block:1px solid var(--line);background:#ff2d8f14;padding:.9rem 0}
+.mq{display:flex;width:max-content;animation:mq 38s linear infinite}
+.mq span{font:400 1.6rem 'Bebas Neue';letter-spacing:.1em;padding:0 1.4rem;white-space:nowrap;color:var(--text)}
+.mq span:nth-child(even){color:var(--gold)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* Sektionen */
+.sec{max-width:1200px;margin:auto;padding:6rem 1.2rem}
+.shead{margin-bottom:2.6rem;text-align:center}.shead .lead{margin-inline:auto}.shead.left{text-align:left}.shead.left .lead{margin-inline:0}
+.shead h2{margin-top:.8rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.card{background:linear-gradient(160deg,#ffffff0c,#ffffff04);border:1px solid var(--line);border-radius:var(--r);padding:1.8rem;box-shadow:0 20px 60px #0008}
+
+/* Speisekarte */
+.cats{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin:0 0 2rem}
+.cats .btn{padding:.7rem 1.4rem}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.1rem}
+.item{position:relative;display:flex;flex-direction:column;gap:.45rem;padding:1.4rem 1.5rem;background:linear-gradient(160deg,#ffffff0b,#ffffff03);border:1px solid var(--line);border-radius:18px;transition:transform .25s,border-color .25s,box-shadow .25s;overflow:hidden}
+.item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--pink),var(--cyan))}
+.item:hover{transform:translateY(-4px);border-color:#00e5ff55;box-shadow:0 14px 40px #00e5ff1f}
+.item .top{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.item h3{font-size:1.75rem}
+.item .pr{font:400 1.45rem 'Bebas Neue';letter-spacing:.04em;color:var(--gold);background:#f6c4531a;border:1px solid #f6c45344;border-radius:99px;padding:.15rem .9rem;white-space:nowrap}
+.item p{margin:.2rem 0 0;color:var(--muted);font-size:.92rem;white-space:pre-line}
+.combo{border-color:#ff2d8f77;background:linear-gradient(160deg,#ff2d8f1f,#00e5ff0a);box-shadow:0 0 40px #ff2d8f22}
+.combo h3{font-size:2.1rem}.combo .pr{font-size:1.9rem}
+.combo p{line-height:1.8}
+.note{color:var(--muted);font-size:.8rem;margin-top:1.4rem;text-align:center}
+#menues .menu{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+
+/* Bonus Card */
+.steps{list-style:none;padding:0;margin:2rem 0 0;display:grid;gap:.9rem}
+.steps li{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border:1px solid var(--line);border-radius:16px;background:#ffffff06}
+.steps b{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:400 1.4rem 'Bebas Neue';background:var(--pink);box-shadow:0 0 18px #ff2d8f77}
+.steps strong{display:block}.steps span{color:var(--muted);font-size:.9rem}
+.stampcard{padding:2rem}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem;margin:1.3rem 0}
+.stamp{aspect-ratio:1;border-radius:18px;border:1px dashed #ffffff22;display:grid;place-items:center;font-size:1.9rem;filter:grayscale(1) opacity(.22)}
+.stamp.on{border:1px solid var(--pink);background:radial-gradient(circle,#ff2d8f55,#ff2d8f22);filter:none;box-shadow:0 0 20px #ff2d8f66}
+
+/* Glücksrad */
+.wheel-sec{position:relative;border-block:1px solid var(--line);background:linear-gradient(#07050dee,#07050dd8),var(--dinerbg) center/cover}
+.wheelbox{position:relative;width:min(460px,100%);margin:auto;padding:16px;border-radius:50%;background:conic-gradient(from 0deg,#ff2d8f,#00e5ff,#ff2d8f,#00e5ff,#ff2d8f,#00e5ff,#ff2d8f,#00e5ff,#ff2d8f);box-shadow:0 0 70px #ff2d8f55,0 0 120px #00e5ff22}
+.wheelbox canvas{width:100%;height:auto;display:block;border-radius:50%;background:#07050d;will-change:transform}
+.pointer{transform-origin:50% 0;position:absolute;top:-6px;left:50%;transform:translateX(-50%);border:16px solid transparent;border-top:34px solid var(--gold);filter:drop-shadow(0 0 10px #f6c453);z-index:2}
 .wheelbox.win{animation:glow .9s ease-in-out 3}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.wheelbox.win{animation:none}}
+@keyframes glow{50%{filter:drop-shadow(0 0 30px #00e5ff) drop-shadow(0 0 44px #ff2d8f)}}
+.msg{min-height:1.5em;font-size:.9rem;color:var(--cyan);margin:1rem 0 0}.msg.err{color:#ff7a9c}
+
+/* Konto & Team */
+.list{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.6rem}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.8rem 1.1rem;border:1px solid var(--line);border-radius:14px;background:#ffffff05}
+.tag{font-size:.7rem;padding:.2rem .8rem;border-radius:99px;border:1px solid var(--cyan);color:var(--cyan)}.tag.done{border-color:var(--muted);color:var(--muted)}
+.cust{padding:1.1rem;border:1px solid var(--line);border-radius:16px;margin-top:.9rem;background:#ffffff05}
+.cust h3{font-size:1.6rem}.cust small{color:var(--muted)}
+.erow{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}.erow label{display:block}.erow .row{grid-column:1/-1;margin-top:.3rem}
+input,textarea,select{width:100%;font:inherit;background:#0b0813;border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;color:var(--text);margin:.3rem 0 .8rem}
+textarea{resize:vertical;min-height:4.5rem}
+label{font-size:.8rem;color:var(--muted)}
+
+/* Über uns & Kontakt */
+.diner{width:100%;display:block;border-radius:var(--r);border:1px solid var(--line);box-shadow:20px 20px 0 #ff2d8f22,0 25px 60px #000a}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-top:2rem}
+.feat{padding:1.1rem;border:1px solid var(--line);border-radius:16px;background:#ffffff06;text-align:center}
+.feat i{font-style:normal;font-size:1.8rem;display:block}.feat strong{display:block;font:400 1.4rem 'Bebas Neue';letter-spacing:.04em;margin-top:.2rem}.feat span{color:var(--muted);font-size:.82rem}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.1rem}
+.info .card{text-align:center}.info .card i{font-style:normal;font-size:2rem}
+.info h3{font-size:1.7rem;color:var(--cyan);margin:.3rem 0 .4rem}.info p{margin:.2rem 0;color:var(--muted)}.info a{color:var(--text)}
+
+/* Dialoge */
+dialog{background:#0f0b19;color:var(--text);border:1px solid var(--pink);border-radius:var(--r);padding:1.8rem;width:min(420px,92vw);box-shadow:0 0 60px #ff2d8f44}
+dialog::backdrop{background:#000b;backdrop-filter:blur(3px)}
+.tabs{display:flex;gap:.5rem;margin-bottom:1rem}
+.legal{width:min(740px,94vw);max-height:88vh;overflow:auto}
+.legal h3{font-size:1.5rem;color:var(--cyan);margin:1.2rem 0 .3rem}.legal p{color:var(--muted);font-size:.9rem;margin:.3rem 0}
+
+/* Footer */
+footer{border-top:1px solid var(--line);background:#0a0710;color:var(--muted);font-size:.88rem}
+footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--line)}
+.fgrid{max-width:1200px;margin:auto;padding:3.5rem 1.2rem 2rem;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:2rem}
+.fgrid h4{font:600 .7rem Poppins;letter-spacing:.24em;color:var(--cyan);margin:0 0 1rem}
+.fgrid a,.fgrid button.lk{display:block;color:var(--muted);text-decoration:none;background:none;border:0;padding:.2rem 0;font:inherit;cursor:pointer;text-align:left}
+.fgrid a:hover,.fgrid button.lk:hover{color:var(--text)}
+.fgrid .logo{display:inline-block;font:400 2.2rem 'Bebas Neue';color:#fff;text-shadow:0 0 14px var(--pink);margin-bottom:.6rem}
+
+/* Einblenden beim Scrollen */
+.js .rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.js .rv.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .split{grid-template-columns:1fr;gap:2.5rem}.sec{padding:4rem 1.2rem}.shead.left{text-align:center}.shead.left .lead{margin-inline:auto}
+  .links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#07050df8;backdrop-filter:blur(12px);padding:.6rem 1.2rem 1.2rem;border-bottom:1px solid var(--line)}
+  .links.open{display:flex}.links a{padding:.9rem 0;border-bottom:1px solid var(--line)}.links a::after{display:none}
+  .burger{display:flex}.nav{gap:.8rem}
+  .feats{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr 1fr}.erow{grid-template-columns:1fr}
+  .row{justify-content:center}.diner{box-shadow:0 20px 50px #000a}
+}
+@media(max-width:520px){.fgrid{grid-template-columns:1fr}.brand img{height:44px}.btn{padding:.9rem 1.3rem}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.mq{animation:none}.js .rv{opacity:1;transform:none;transition:none}.wheelbox.win{animation:none}.btn,.item{transition:none}}
 </style>
 </head>
-<body>
-<header><nav>
-  <a class="logo" href="#top" aria-label="BURGERHAUS Startseite"><img src="https://verblasst-mythos.github.io/Burger-Haus/logo.png" alt="BURGERHAUS" height="46"></a>
-  <a class="l" href="#speisekarte">Speisekarte</a><a class="l" href="#menues">Menüs</a><a class="l" href="#bonus">Bonus Card</a><a class="l" href="#rad">Glücksrad</a><a class="l" href="#ueber">Über uns</a><a class="l" href="#kontakt">Kontakt</a>
-  <a class="l hide" id="navAcc" href="#konto">Mein Konto</a><a class="l hide" id="navStaff" href="#team">Team</a>
-  <button class="btn" id="authBtn">Anmelden</button>
+<body style="--dinerbg:url(https://verblasst-mythos.github.io/Burger-Haus/diner.jpg)">
+<header id="hdr"><nav class="nav">
+  <a class="brand" href="#top" aria-label="BURGERHAUS Startseite"><img src="https://verblasst-mythos.github.io/Burger-Haus/logo.png" alt="BURGERHAUS" height="52"></a>
+  <div class="links" id="links">
+    <a href="#speisekarte">Speisekarte</a><a href="#menues">Menüs</a><a href="#bonus">Bonus Card</a><a href="#rad">Glücksrad</a><a href="#ueber">Über uns</a><a href="#kontakt">Kontakt</a>
+    <a class="hide" id="navAcc" href="#konto">Mein Konto</a><a class="hide" id="navStaff" href="#team">Team</a>
+  </div>
+  <button class="btn sm" id="authBtn">Anmelden</button>
+  <button class="burger" id="burger" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="links"><span></span><span></span><span></span></button>
 </nav></header>
 
 <main id="top">
-<section class="hero">
-  <div>
-    <h1><span class="pink">Willkommen</span><br>im <span class="cyan">Burgerhaus</span></h1>
-    <p>Handgemachte Smash Burger, knusprige Wings und eiskalte Drinks mitten in Köln. Jeder Einkauf bringt dich einem kostenlosen Smart Menü näher.</p>
-    <div class="row"><a class="btn" href="#speisekarte">Speisekarte ansehen</a><a class="btn c" href="#bonus">Bonus-Stempelkarte</a><a class="btn o" href="#rad">Glücksrad drehen</a></div>
-  </div>
-  <img class="hero-logo" src="https://verblasst-mythos.github.io/Burger-Haus/logo.png" alt="BURGERHAUS Logo mit goldenem Burger und zwei Löwen">
+<section class="hero-banner"><img src="https://verblasst-mythos.github.io/Burger-Haus/banner.jpg" alt="BURGERHAUS Banner mit goldenem Burger-Wappen, Burgern und Flammen"></section>
+<section class="hero-in">
+  <span class="eyebrow">Köln · Neon Smash Burger Diner</span>
+  <h1>Willkommen im <span class="pink">Burgerhaus</span></h1>
+  <p>Handgemachte Smash Burger, knusprige Wings und eiskalte Drinks mitten in Köln. Jeder Einkauf bringt dich einem kostenlosen Smart Menü näher.</p>
+  <div class="row c"><a class="btn" href="#speisekarte">Speisekarte ansehen</a><a class="btn c" href="#bonus">Bonus-Stempelkarte</a><a class="btn o" href="#rad">Glücksrad drehen</a></div>
 </section>
+<div class="marquee" aria-hidden="true"><div class="mq"><span>Smash Burger</span><span>✦</span> <span>Crispy Wings</span><span>✦</span> <span>Milkshakes</span><span>✦</span> <span>Winter Edition</span><span>✦</span> <span>Bonus Card</span><span>✦</span> <span>Glücksrad</span><span>✦</span> <span>Smash Burger</span><span>✦</span> <span>Crispy Wings</span><span>✦</span> <span>Milkshakes</span><span>✦</span> <span>Winter Edition</span><span>✦</span> <span>Bonus Card</span><span>✦</span> <span>Glücksrad</span><span>✦</span></div></div>
 
-<section class="banner"><img src="https://verblasst-mythos.github.io/Burger-Haus/banner.jpg" alt="BURGERHAUS Banner mit Burgern und Flammen"></section>
-
-<section id="speisekarte">
-  <h2>Unsere <span class="pink">Speisekarte</span></h2>
-  <div class="row"><button class="btn c" id="cardImgBtn" type="button">Karte als Bild ansehen</button></div>
+<section id="speisekarte" class="sec">
+  <div class="shead rv"><span class="eyebrow">Frisch vom Grill</span><h2>Unsere <span class="pink">Speisekarte</span></h2>
+    <div class="row c" style="margin-top:1.4rem"><button class="btn o" id="cardImgBtn" type="button">Karte als Bild ansehen</button></div></div>
   <div class="cats" id="cats" role="tablist" aria-label="Kategorien"></div>
   <div class="menu" id="menuGrid"></div>
   <p class="note">Preise in Euro. Allergene und Zusatzstoffe nennen wir dir gern an der Theke.</p>
 </section>
 
-<section id="menues">
-  <h2>Unsere <span class="cyan">Menüs</span></h2>
-  <p style="color:var(--muted);max-width:60ch">Große Pakete für Gruppen, Feiern und Events. Frag an der Theke nach Vorbestellung.</p>
-  <div class="menu" id="comboGrid" style="margin-top:1.4rem"></div>
+<section id="menues" class="sec" style="padding-top:0">
+  <div class="shead rv"><span class="eyebrow">Für Gruppen und Events</span><h2>Unsere <span class="cyan">Menüs</span></h2>
+    <p class="lead">Große Pakete für Gruppen, Feiern und Events. Frag an der Theke nach Vorbestellung.</p></div>
+  <div class="menu" id="comboGrid"></div>
 </section>
 
-<section id="bonus" class="two">
-  <div>
-    <h2>Die <span class="pink">Burgerhaus</span> Bonus Card</h2>
-    <p style="color:var(--muted)">Kein Punktesystem, keine Rechnerei: Jeder Einkauf zählt genau einen Stempel, egal wie hoch die Rechnung ist. Bei 10 Stempeln gibt es ein kostenloses Smart Menü.</p>
-    <p style="color:var(--muted)">Konto anlegen, beim Bezahlen deine Kunden-ID zeigen, Stempel sammeln.</p>
-    <div class="row"><button class="btn" data-auth>Konto anlegen</button></div>
+<section id="bonus" class="sec"><div class="split">
+  <div class="rv">
+    <div class="shead left" style="margin-bottom:0"><span class="eyebrow">Unser Bonusprogramm</span><h2>Die <span class="pink">Burgerhaus</span> Bonus Card</h2>
+      <p class="lead">Kein Punktesystem, keine Rechnerei: Jeder Einkauf zählt genau einen Stempel, egal wie hoch die Rechnung ist. Bei 10 Stempeln gibt es ein kostenloses Smart Menü.</p></div>
+    <ol class="steps">
+      <li><b>1</b><div><strong>Konto anlegen</strong><span>Kostenlos registrieren und persönliche Kunden-ID erhalten.</span></div></li>
+      <li><b>2</b><div><strong>Kunden-ID zeigen</strong><span>Beim Bezahlen deine Kunden-ID vorzeigen, wir stempeln.</span></div></li>
+      <li><b>3</b><div><strong>Smart Menü sichern</strong><span>Bei 10 Stempeln gibt es dein Gratis-Menü.</span></div></li>
+    </ol>
+    <div class="row"><button class="btn" data-auth>Konto anlegen</button><a class="btn o" href="#rad">Glücksrad drehen</a></div>
   </div>
-  <div class="card">
-    <strong class="cyan" style="font-size:.75rem;letter-spacing:.2em">DEINE STEMPELKARTE</strong>
-    <div class="stamps" id="stamps"></div>
-    <div id="cardInfo" style="color:var(--muted);text-align:center">10 Stempel = 1x Smart Menü gratis</div>
-  </div>
-</section>
+  <div class="card stampcard rv"><span class="eyebrow">Deine Stempelkarte</span><div class="stamps" id="stamps"></div>
+    <div id="cardInfo" class="muted center">10 Stempel = 1x Smart Menü gratis</div></div>
+</div></section>
 
-<section id="rad" class="two">
-  <div class="wheelbox"><div class="pointer"></div><canvas id="wheel" width="600" height="600" aria-label="Glücksrad"></canvas></div>
-  <div>
-    <h2>Dreh das <span class="cyan">Glücksrad</span></h2>
-    <p style="color:var(--muted)">Einmal pro Tag drehen. Dein Gewinn landet sofort in deinem Konto, zeig ihn an der Kasse vor.</p>
+<section id="rad" class="wheel-sec"><div class="sec split">
+  <div class="rv"><div class="wheelbox"><div class="pointer"></div><canvas id="wheel" width="600" height="600" aria-label="Glücksrad"></canvas></div></div>
+  <div class="rv">
+    <div class="shead left" style="margin-bottom:0"><span class="eyebrow">Täglich ein Versuch</span><h2>Dreh das <span class="cyan">Glücksrad</span></h2>
+      <p class="lead">Einmal pro Tag drehen. Dein Gewinn landet sofort in deinem Konto, zeig ihn an der Kasse vor.</p></div>
     <div class="row"><button class="btn c" id="spinBtn">Jetzt drehen</button><button class="btn o" id="sndBtn" type="button" aria-pressed="true">Ton an</button></div>
     <p class="msg" id="spinMsg" role="status"></p>
   </div>
-</section>
+</div></section>
 
-<section id="konto" class="hide">
-  <h2>Mein <span class="pink">Konto</span></h2>
-  <div class="card" style="margin-top:1.2rem">
+<section id="konto" class="sec hide">
+  <div class="shead rv"><span class="eyebrow">Dein Bereich</span><h2>Mein <span class="pink">Konto</span></h2></div>
+  <div class="card" style="max-width:760px;margin:auto">
     <div id="me"></div>
-    <h3 style="margin-top:1.4rem;font-size:1.6rem">Meine Gewinne</h3>
+    <h3 style="margin-top:1.6rem;font-size:1.8rem">Meine Gewinne</h3>
     <ul class="list" id="myPrizes"></ul>
   </div>
 </section>
 
-<section id="team" class="hide">
-  <h2>Team<span class="cyan">bereich</span></h2>
-  <div class="card" style="margin-top:1.2rem">
+<section id="team" class="sec hide">
+  <div class="shead rv"><span class="eyebrow">Nur für Mitarbeiter</span><h2>Team<span class="cyan">bereich</span></h2></div>
+  <div class="card">
     <label for="q">Kunde suchen (Name oder Kunden-ID)</label>
     <input id="q" placeholder="z. B. BH-3F9A1C">
     <p class="msg" id="teamMsg" role="status"></p>
     <div id="custList"></div>
   </div>
   <div class="card" style="margin-top:1.2rem">
-    <h3 style="font-size:1.8rem;color:var(--cyan)">Speisekarte bearbeiten</h3>
-    <p style="color:var(--muted);font-size:.9rem">Änderungen sind sofort für alle Gäste sichtbar. Der letzte Eintrag unten ist zum Hinzufügen.</p>
+    <h3 style="font-size:1.9rem;color:var(--cyan)">Speisekarte bearbeiten</h3>
+    <p class="muted" style="font-size:.9rem">Änderungen sind sofort für alle Gäste sichtbar. Der letzte Eintrag unten ist zum Hinzufügen.</p>
     <p class="msg" id="menuMsg" role="status"></p>
     <div id="menuRows"></div>
   </div>
 </section>
-<section id="ueber" class="two">
-  <div>
-    <h2>Über <span class="pink">uns</span></h2>
-    <p style="color:var(--muted)">Das Burgerhaus ist ein Neon-Diner mitten in Köln. Wir braten unsere Smash Burger frisch auf der heißen Platte, bis außen eine knusprige Kruste entsteht und innen alles saftig bleibt. Dazu gibt es knusprige Wings, eiskalte Drinks und ein Stempelsystem, das Stammgäste belohnt.</p>
-    <p style="color:var(--muted)">Zum Mitnehmen, vor Ort oder als Catering für deine Feier. Inhaber: Cano Yilmaz.</p>
-  </div>
-  <div><img class="diner" src="https://verblasst-mythos.github.io/Burger-Haus/diner.jpg" alt="Innenraum des BURGERHAUS mit Neon-Theke" loading="lazy"><div class="card" style="margin-top:1rem"><div class="info" style="margin:0">
-    <div><h3>Vor Ort</h3><p>Neon-Diner mit Sitzplätzen</p></div>
-    <div><h3>Zum Mitnehmen</h3><p>Schnell an der Theke</p></div>
-    <div><h3>Catering</h3><p>Burger und Wings für Events</p></div>
-  </div></div></div>
-</section>
 
-<section id="kontakt">
-  <h2><span class="cyan">Kontakt</span> und Öffnungszeiten</h2>
-  <div class="info">
-    <div class="card"><h3>Adresse</h3><p>BURGERHAUS</p><p>[Straße und Hausnummer]</p><p>[PLZ] Köln</p></div>
-    <div class="card"><h3>Öffnungszeiten</h3><p>Montag bis Sonntag geöffnet</p><p>[Uhrzeit von] bis [Uhrzeit bis] Uhr</p></div>
-    <div class="card"><h3>Telefon</h3><p><a href="tel:+49000000000">[Telefonnummer]</a></p></div>
+<section id="ueber" class="sec"><div class="split">
+  <div class="rv"><img class="diner" src="https://verblasst-mythos.github.io/Burger-Haus/diner.jpg" alt="Innenraum des BURGERHAUS mit Neon-Theke und Barhockern" loading="lazy"></div>
+  <div class="rv">
+    <div class="shead left" style="margin-bottom:0"><span class="eyebrow">Das Burgerhaus</span><h2>Über <span class="pink">uns</span></h2>
+      <p class="lead">Das Burgerhaus ist ein Neon-Diner mitten in Köln. Wir braten unsere Smash Burger frisch auf der heißen Platte, bis außen eine knusprige Kruste entsteht und innen alles saftig bleibt. Dazu gibt es knusprige Wings, eiskalte Drinks und ein Stempelsystem, das Stammgäste belohnt.</p>
+      <p class="lead">Inhaber: Cano Yilmaz.</p></div>
+    <div class="feats">
+      <div class="feat"><i>🍔</i><strong>Vor Ort</strong><span>Neon-Diner mit Sitzplätzen</span></div>
+      <div class="feat"><i>🥡</i><strong>Zum Mitnehmen</strong><span>Schnell an der Theke</span></div>
+      <div class="feat"><i>🎉</i><strong>Catering</strong><span>Burger und Wings für Events</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="kontakt" class="sec" style="padding-top:0">
+  <div class="shead rv"><span class="eyebrow">Besuch uns</span><h2><span class="cyan">Kontakt</span> und Öffnungszeiten</h2></div>
+  <div class="info rv">
+    <div class="card"><i>📍</i><h3>Adresse</h3><p>BURGERHAUS</p><p>[Straße und Hausnummer]</p><p>[PLZ] Köln</p></div>
+    <div class="card"><i>🕒</i><h3>Öffnungszeiten</h3><p>Montag bis Sonntag geöffnet</p><p>[Uhrzeit von] bis [Uhrzeit bis] Uhr</p></div>
+    <div class="card"><i>📞</i><h3>Telefon</h3><p><a href="tel:+49000000000">[Telefonnummer]</a></p></div>
   </div>
 </section>
 </main>
@@ -482,6 +558,18 @@ async function searchCustomers(){
 
 refresh();
 loadMenu();
+</script>
+<script>
+// Kopfzeile, Menü, Einblenden
+(function(){
+  const h=document.getElementById("hdr"),b=document.getElementById("burger"),l=document.getElementById("links");
+  const sc=()=>h.classList.toggle("solid",scrollY>40);sc();addEventListener("scroll",sc,{passive:true});
+  b.onclick=()=>{const o=l.classList.toggle("open");b.setAttribute("aria-expanded",o);b.setAttribute("aria-label",o?"Menü schließen":"Menü öffnen")};
+  l.addEventListener("click",e=>{if(e.target.tagName==="A"){l.classList.remove("open");b.setAttribute("aria-expanded","false")}});
+  const els=document.querySelectorAll(".rv");
+  if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.12});els.forEach(e=>io.observe(e))}
+  else els.forEach(e=>e.classList.add("in"));
+})();
 </script>
 </body>
 </html>
