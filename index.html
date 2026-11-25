@@ -611,7 +611,7 @@ loadMenu();
     if(!t.length||t.every(e=>e.classList.contains("hide")))v="home";
     document.querySelectorAll("[data-view]").forEach(e=>e.classList.toggle("active",e.dataset.view===v));
     document.querySelectorAll("#links a").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+v));
-    document.body.dataset.view=v;if(scroll)window.scrollTo(0,0);
+    document.body.dataset.page=v;if(scroll)window.scrollTo(0,0);
   };
   addEventListener("hashchange",()=>route(true));route(true);
   const els=document.querySelectorAll(".rv");
