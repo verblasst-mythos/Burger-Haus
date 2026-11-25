@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BURGERHAUS · Köln Smash Burger</title>
+<link rel="icon" href="img/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -29,7 +30,7 @@ nav a.l:hover{color:var(--cyan)}
 section{max-width:1200px;margin:auto;padding:4.5rem 1.2rem}
 .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;min-height:70vh}
 .hero p{color:var(--muted);max-width:46ch}
-.hero .ph{aspect-ratio:4/5;border-radius:28px;background:radial-gradient(circle at 30% 20%,#ff2d8f55,transparent 55%),radial-gradient(circle at 80% 80%,#00e5ff44,transparent 50%),var(--panel);border:1px solid var(--line);display:grid;place-items:center;font:5rem 'Bebas Neue';text-align:center;color:#fff;text-shadow:0 0 30px var(--pink)}
+.hero .ph{display:none;aspect-ratio:4/5;border-radius:28px;background:radial-gradient(circle at 30% 20%,#ff2d8f55,transparent 55%),radial-gradient(circle at 80% 80%,#00e5ff44,transparent 50%),var(--panel);border:1px solid var(--line);display:grid;place-items:center;font:5rem 'Bebas Neue';text-align:center;color:#fff;text-shadow:0 0 30px var(--pink)}
 .row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.6rem}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:1.6rem}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center}
@@ -43,7 +44,7 @@ section{max-width:1200px;margin:auto;padding:4.5rem 1.2rem}
 .list li{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:14px}
 .tag{font-size:.7rem;padding:.2rem .7rem;border-radius:99px;border:1px solid var(--cyan);color:var(--cyan)}
 .tag.done{border-color:var(--muted);color:var(--muted)}
-input{width:100%;background:#0b0813;border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;color:var(--text);font:inherit;margin:.3rem 0 .8rem}
+input,textarea,select{width:100%;font:inherit;background:#0b0813;border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;color:var(--text);font:inherit;margin:.3rem 0 .8rem}
 label{font-size:.8rem;color:var(--muted)}
 dialog{background:var(--panel);color:var(--text);border:1px solid var(--pink);border-radius:22px;padding:1.6rem;width:min(400px,92vw);box-shadow:0 0 50px #ff2d8f44}
 dialog::backdrop{background:#000a}
@@ -55,6 +56,12 @@ dialog::backdrop{background:#000a}
 .cust h3{font-size:1.5rem}.cust small{color:var(--muted)}
 footer{border-top:1px solid var(--line);background:#0b0713;color:var(--muted);font-size:.85rem}
 footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.logo img{height:46px;width:auto;display:block}
+.hero-logo{width:100%;max-width:460px;margin:auto;display:block;filter:drop-shadow(0 0 40px #ff2d8f66)}
+.banner{padding-top:0;padding-bottom:0}.banner img{width:100%;display:block;border-radius:24px;border:1px solid var(--line)}
+.diner{width:100%;display:block;border-radius:20px;border:1px solid var(--line)}
+.erow{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}.erow label{display:block}.erow .row{grid-column:1/-1;margin-top:0}
+textarea{resize:vertical;min-height:4.5rem}
 .cats{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.4rem 0}
 .cats .btn{padding:.6rem 1.1rem}
 .menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
@@ -82,7 +89,7 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
 </head>
 <body>
 <header><nav>
-  <a class="logo" href="#top">BURGERHAUS</a>
+  <a class="logo" href="#top" aria-label="BURGERHAUS Startseite"><img src="img/logo.png" alt="BURGERHAUS" height="46"></a>
   <a class="l" href="#speisekarte">Speisekarte</a><a class="l" href="#menues">Menüs</a><a class="l" href="#bonus">Bonus Card</a><a class="l" href="#rad">Glücksrad</a><a class="l" href="#ueber">Über uns</a><a class="l" href="#kontakt">Kontakt</a>
   <a class="l hide" id="navAcc" href="#konto">Mein Konto</a><a class="l hide" id="navStaff" href="#team">Team</a>
   <button class="btn" id="authBtn">Anmelden</button>
@@ -95,11 +102,14 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
     <p>Handgemachte Smash Burger, knusprige Wings und eiskalte Drinks mitten in Köln. Jeder Einkauf bringt dich einem kostenlosen Smart Menü näher.</p>
     <div class="row"><a class="btn" href="#speisekarte">Speisekarte ansehen</a><a class="btn c" href="#bonus">Bonus-Stempelkarte</a><a class="btn o" href="#rad">Glücksrad drehen</a></div>
   </div>
-  <div class="ph" role="img" aria-label="Platzhalter für Diner-Foto">BURGER<br>HAUS</div>
+  <img class="hero-logo" src="img/logo.png" alt="BURGERHAUS Logo mit goldenem Burger und zwei Löwen">
 </section>
+
+<section class="banner"><img src="img/banner.jpg" alt="BURGERHAUS Banner mit Burgern und Flammen"></section>
 
 <section id="speisekarte">
   <h2>Unsere <span class="pink">Speisekarte</span></h2>
+  <div class="row"><button class="btn c" id="cardImgBtn" type="button">Karte als Bild ansehen</button></div>
   <div class="cats" id="cats" role="tablist" aria-label="Kategorien"></div>
   <div class="menu" id="menuGrid"></div>
   <p class="note">Preise in Euro. Allergene und Zusatzstoffe nennen wir dir gern an der Theke.</p>
@@ -152,6 +162,12 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
     <p class="msg" id="teamMsg" role="status"></p>
     <div id="custList"></div>
   </div>
+  <div class="card" style="margin-top:1.2rem">
+    <h3 style="font-size:1.8rem;color:var(--cyan)">Speisekarte bearbeiten</h3>
+    <p style="color:var(--muted);font-size:.9rem">Änderungen sind sofort für alle Gäste sichtbar. Der letzte Eintrag unten ist zum Hinzufügen.</p>
+    <p class="msg" id="menuMsg" role="status"></p>
+    <div id="menuRows"></div>
+  </div>
 </section>
 <section id="ueber" class="two">
   <div>
@@ -159,11 +175,11 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
     <p style="color:var(--muted)">Das Burgerhaus ist ein Neon-Diner mitten in Köln. Wir braten unsere Smash Burger frisch auf der heißen Platte, bis außen eine knusprige Kruste entsteht und innen alles saftig bleibt. Dazu gibt es knusprige Wings, eiskalte Drinks und ein Stempelsystem, das Stammgäste belohnt.</p>
     <p style="color:var(--muted)">Zum Mitnehmen, vor Ort oder als Catering für deine Feier. Inhaber: Cano Yilmaz.</p>
   </div>
-  <div class="card"><div class="info" style="margin:0">
+  <div><img class="diner" src="img/diner.jpg" alt="Innenraum des BURGERHAUS mit Neon-Theke" loading="lazy"><div class="card" style="margin-top:1rem"><div class="info" style="margin:0">
     <div><h3>Vor Ort</h3><p>Neon-Diner mit Sitzplätzen</p></div>
     <div><h3>Zum Mitnehmen</h3><p>Schnell an der Theke</p></div>
     <div><h3>Catering</h3><p>Burger und Wings für Events</p></div>
-  </div></div>
+  </div></div></div>
 </section>
 
 <section id="kontakt">
@@ -185,6 +201,11 @@ footer div{max-width:1200px;margin:auto;padding:2rem 1.2rem;display:flex;justify
   </div>
   <div><span>© 2026 BURGERHAUS · Inhaber Cano Yilmaz</span><span>Dein Burger. Dein Geschmack. Dein BURGERHAUS.</span></div>
 </footer>
+
+<dialog id="cardDlg" class="legal">
+  <img src="img/speisekarte.jpg" alt="Speisekarte des BURGERHAUS" style="width:100%;border-radius:14px" loading="lazy">
+  <div class="row"><button class="btn o" data-close>Schließen</button></div>
+</dialog>
 
 <dialog id="impressum" class="legal">
   <h2>Impressum</h2>
@@ -239,7 +260,8 @@ let me = null, mode = "login", rot = 0, spinning = false;
 
 function el(tag, text, cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e}
 const fmt = d => new Date(d).toLocaleDateString("de-DE");
-const ERR={already_spun:"Heute hast du schon gedreht. Komm morgen wieder!",not_logged_in:"Bitte melde dich zuerst an.",customer_not_found:"Kunden-ID nicht gefunden.",forbidden:"Dafür fehlt die Berechtigung.",invalid_login:"Name oder Passwort falsch.",name_taken:"Dieser Name ist schon vergeben. Nimm einen anderen.",invalid_name:"Der Name muss 3 bis 40 Zeichen lang sein.",weak_password:"Das Passwort braucht mindestens 8 Zeichen.",too_many_attempts:"Zu viele Versuche. Bitte warte 15 Minuten."};
+const ERR={already_spun:"Heute hast du schon gedreht. Komm morgen wieder!",not_logged_in:"Bitte melde dich zuerst an.",customer_not_found:"Kunden-ID nicht gefunden.",forbidden:"Dafür fehlt die Berechtigung.",invalid_login:"Name oder Passwort falsch.",name_taken:"Dieser Name ist schon vergeben. Nimm einen anderen.",invalid_input:"Bitte Kategorie, Name und Preis ausfüllen.",invalid_name:"Der Name muss 3 bis 40 Zeichen lang sein.",weak_password:"Das Passwort braucht mindestens 8 Zeichen.",too_many_attempts:"Zu viele Versuche. Bitte warte 15 Minuten."};
+const todayDE=()=>new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Berlin"});
 const errText = e => ERR[e?.message] || "Etwas ist schiefgelaufen: " + (e?.message||e);
 
 // ---- Glücksrad zeichnen ----
@@ -276,19 +298,48 @@ const MENU = {
     ["Glühwein mit Schuss","","200"]]
 };
 const COMBOS=[
-  ["Chicken Menü","5x Pommes\n5x Wingsburger\n5x Curley Fries\n5x Classic Wings\n5x Hot Wings","5850"],
-  ["Smart Menü","20x Burgerhaus TS\n20x Energy Drinks","10500"],
-  ["Burgerhaus Menü","10x Burgerhaus TS\n10x Chickenburger\n10x Hotwings\n10x Curly Fries\n10x Eistee\n10x Milkshake\n10x Energy Drink\n10x ECola","17000"]];
-function renderMenu(cat){
-  const g=$("menuGrid");g.replaceChildren();
-  MENU[cat].forEach(([n,d,pr])=>{const c=el("div",null,"item"),t=el("div",null,"top");
-    t.append(el("h3",n),el("span",pr+" €","pr"));if(d)c.append(t,el("p",d));else c.append(t);g.append(c)});
-  document.querySelectorAll("#cats button").forEach(b=>{const on=b.textContent===cat;b.className="btn"+(on?"":" o");b.setAttribute("aria-selected",on)});
+  ["Chicken Menü","5x Pommes\n5x Wingsburger\n5x Curley Fries\n5x Classic Wings\n5x Hot Wings","5300"],
+  ["Smart Menü","20x Burgerhaus TS\n20x Energy Drinks","8000"],
+  ["Burgerhaus Menü","10x Burgerhaus TS\n10x Chickenburger\n10x Hotwings\n10x Curly Fries\n10x Eistee\n10x Milkshake\n10x Energy Drink\n10x ECola","15700"]];
+let items=[],curCat=null;
+const FALLBACK=[...Object.entries(MENU).flatMap(([c,l],ci)=>l.map(([n,d,pr],i)=>({id:null,category:c,name:n,description:d,price:pr,kind:"item",sort:ci*10+i+10}))),
+  ...COMBOS.map(([n,d,pr],i)=>({id:null,category:"Menüs",name:n,description:d,price:pr,kind:"combo",sort:100+i}))];
+const priceTxt=p=>/^\d+([.,]\d+)?$/.test(p)?p+" €":p;
+function card(it,cls){const c=el("div",null,"item"+(cls?" "+cls:"")),t=el("div",null,"top");t.append(el("h3",it.name),el("span",priceTxt(it.price),"pr"));c.append(t);if(it.description)c.append(el("p",it.description));return c}
+function renderMenu(){
+  const cats=[...new Set(items.filter(x=>x.kind==="item").map(x=>x.category))];
+  if(!cats.includes(curCat))curCat=cats[0];
+  const bar=$("cats");bar.replaceChildren();
+  cats.forEach(k=>{const b=el("button",k,"btn"+(k===curCat?"":" o"));b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",k===curCat);b.onclick=()=>{curCat=k;renderMenu()};bar.append(b)});
+  const g=$("menuGrid");g.replaceChildren();items.filter(x=>x.kind==="item"&&x.category===curCat).forEach(x=>g.append(card(x)));
+  const cg=$("comboGrid");cg.replaceChildren();items.filter(x=>x.kind==="combo").forEach(x=>cg.append(card(x,"combo")));
 }
-Object.keys(MENU).forEach(k=>{const b=el("button",k,"btn o");b.type="button";b.setAttribute("role","tab");b.onclick=()=>renderMenu(k);$("cats").append(b)});
-renderMenu(Object.keys(MENU)[0]);
-COMBOS.forEach(([n,d,pr])=>{const c=el("div",null,"item combo"),t=el("div",null,"top");
-  t.append(el("h3",n),el("span",pr.startsWith("+")?pr:pr+" €","pr"));c.append(t,el("p",d));$("comboGrid").append(c)});
+async function loadMenu(){try{const d=await rpc("menu_list");items=d.length?d:FALLBACK}catch{items=FALLBACK}renderMenu();if(isStaff())renderEditor()}
+
+function renderEditor(){
+  const box=$("menuRows");box.replaceChildren();
+  const next=items.reduce((m,x)=>Math.max(m,x.sort||0),0)+10;
+  [...items.filter(x=>x.id!==null),{id:null,category:"",name:"",description:"",price:"",kind:"item",sort:next}].forEach(it=>{
+    const d=el("div",null,"cust erow"),f={};
+    const add=(k,lab,node)=>{const w=el("label",lab);node.value=it[k]??"";f[k]=node;w.append(node);d.append(w)};
+    add("category","Kategorie",el("input"));add("name","Name",el("input"));
+    add("description","Beschreibung (Zeilenumbruch erlaubt)",el("textarea"));
+    add("price","Preis (nur Zahl oder Text)",el("input"));
+    const sel=el("select");[["item","Gericht"],["combo","Menü"]].forEach(([v,t])=>{const o=el("option",t);o.value=v;sel.append(o)});add("kind","Art",sel);
+    const so=el("input");so.type="number";add("sort","Position (kleiner = weiter oben)",so);
+    const row=el("div",null,"row"),save=el("button",it.id===null?"Hinzufügen":"Speichern","btn c");
+    const msg=(t,err)=>{$("menuMsg").className="msg"+(err?" err":"");$("menuMsg").textContent=t};
+    save.onclick=async()=>{save.disabled=true;
+      try{await rpc("menu_save",{p_token:getTok(),p_id:it.id,p_category:f.category.value,p_name:f.name.value,p_description:f.description.value,p_price:f.price.value,p_kind:f.kind.value,p_sort:parseInt(f.sort.value)||0});
+        msg(it.id===null?"Eintrag hinzugefügt.":"Gespeichert.");await loadMenu()}
+      catch(e){msg(errText(e),true);save.disabled=false}};
+    row.append(save);
+    if(it.id!==null){const del=el("button","Löschen","btn o");del.onclick=async()=>{if(!confirm(`„${it.name}“ wirklich löschen?`))return;del.disabled=true;
+      try{await rpc("menu_delete",{p_token:getTok(),p_id:it.id});msg("Gelöscht.");await loadMenu()}catch(e){msg(errText(e),true);del.disabled=false}};row.append(del)}
+    d.append(row);box.append(d);
+  });
+}
+$("cardImgBtn").onclick=()=>$("cardDlg").showModal();
 
 // ---- Rechtstexte & Team-Login ----
 document.querySelectorAll("[data-legal]").forEach(b=>b.onclick=()=>$(b.dataset.legal).showModal());
@@ -321,7 +372,7 @@ $("authForm").onsubmit=async e=>{
 async function refresh(){
   const t=getTok();
   if(!t){me=null;render();return}
-  try{const d=await rpc("get_me",{p_token:t});me=d.profile;render();showPrizes(d.prizes);if(isStaff())searchCustomers()}
+  try{const d=await rpc("get_me",{p_token:t});me=d.profile;render();showPrizes(d.prizes);if(isStaff()){searchCustomers();renderEditor()}}
   catch(e){setTok(null);me=null;render()}
 }
 const isStaff=()=>me&&["staff","admin"].includes(me.role);
@@ -335,7 +386,10 @@ function render(){
   $("cardInfo").textContent=me?`${me.stamps} von 10 Stempeln · Kunden-ID: ${me.customer_id}`:"10 Stempel = 1x Smart Menü gratis";
   const info=$("me");info.replaceChildren();
   if(me){info.append(el("div",me.name||"Gast","cyan"),el("div","Kunden-ID: "+me.customer_id));info.firstChild.style.fontSize="1.4rem"}
-  $("spinBtn").disabled=false;$("spinMsg").textContent="";
+  const done=!!me&&me.last_spin===todayDE();
+  $("spinBtn").disabled=done;$("spinMsg").className="msg";
+  $("spinMsg").textContent=done?"Heute hast du schon gedreht. Komm morgen wieder!":"";
+  document.querySelectorAll("[data-auth]").forEach(b=>b.textContent=me?"Mein Konto ansehen":"Konto anlegen");
 }
 
 function showPrizes(data){
@@ -381,12 +435,13 @@ $("spinBtn").onclick=async()=>{
   if(spinning)return;spinning=true;$("spinBtn").disabled=true;$("spinMsg").className="msg";$("spinMsg").textContent="";
   $("wheel").parentElement.classList.remove("win");
   try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();audio.resume()}catch{}
-  phase="spin";run();
   let label,error;try{label=await rpc("spin_wheel",{p_token:getTok()})}catch(e){error=e}
   if(error){
-    land(vel*1.2/3,1200,()=>{spinning=false;$("spinBtn").disabled=false});
+    spinning=false;$("spinBtn").disabled=error.message==="already_spun";
+    if(error.message==="already_spun")me.last_spin=todayDE();
     $("spinMsg").className="msg err";$("spinMsg").textContent=errText(error);return;
   }
+  phase="spin";run();await new Promise(r=>setTimeout(r,700));
   const idx=SEG.map((s,i)=>s===label?i:-1).filter(i=>i>=0),i=idx[Math.floor(Math.random()*idx.length)];
   const off=(Math.random()-.5)*.7,target=((360-(i+.5+off)*SA)%360+360)%360;
   const need=((target-ang)%360+360)%360,dur=5200;
@@ -426,6 +481,7 @@ async function searchCustomers(){
 }
 
 refresh();
+loadMenu();
 </script>
 </body>
 </html>
