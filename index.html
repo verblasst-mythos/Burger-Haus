@@ -143,6 +143,20 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
 .fgrid a:hover,.fgrid button.lk:hover{color:var(--text)}
 .fgrid .logo{display:inline-block;font:400 2.2rem 'Bebas Neue';color:#fff;text-shadow:0 0 14px var(--pink);margin-bottom:.6rem}
 
+/* Reiter = eigene Fenster */
+[data-view]{display:none}
+[data-view].active{display:block;animation:vin .45s ease}
+@keyframes vin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+main{min-height:78vh}
+main>.sec,.wheel-sec>.sec{padding-top:8rem}
+.links a.active{color:var(--cyan)}.links a.active::after{width:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.tiles{max-width:1200px;margin:0 auto;padding:3.5rem 1.2rem 5rem}
+.tiles.active{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.tile{display:flex;flex-direction:column;gap:.3rem;padding:1.8rem 1.4rem;text-decoration:none;text-align:center;border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(160deg,#ffffff0d,#ffffff04);transition:transform .25s,border-color .25s,box-shadow .25s}
+.tile:hover{transform:translateY(-6px);border-color:#ff2d8f88;box-shadow:0 18px 44px #ff2d8f2a}
+.tile i{font-style:normal;font-size:2.4rem}.tile strong{font:400 1.9rem 'Bebas Neue';letter-spacing:.04em}.tile span{color:var(--muted);font-size:.85rem}
+@media(max-width:900px){.tiles.active{grid-template-columns:1fr 1fr}main>.sec,.wheel-sec>.sec{padding-top:6.5rem}}
+
 /* Einblenden beim Scrollen */
 .js .rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
 .js .rv.in{opacity:1;transform:none}
@@ -156,12 +170,12 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
   .row{justify-content:center}.diner{box-shadow:0 20px 50px #000a}
 }
 @media(max-width:520px){.fgrid{grid-template-columns:1fr}.brand img{height:44px}.btn{padding:.9rem 1.3rem}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.mq{animation:none}.js .rv{opacity:1;transform:none;transition:none}.wheelbox.win{animation:none}.btn,.item{transition:none}}
+@media(prefers-reduced-motion:reduce){[data-view].active{animation:none}html{scroll-behavior:auto}.mq{animation:none}.js .rv{opacity:1;transform:none;transition:none}.wheelbox.win{animation:none}.btn,.item{transition:none}}
 </style>
 </head>
 <body style="--dinerbg:url(https://verblasst-mythos.github.io/Burger-Haus/diner.jpg)">
 <header id="hdr"><nav class="nav">
-  <a class="brand" href="#top" aria-label="BURGERHAUS Startseite"><img src="https://verblasst-mythos.github.io/Burger-Haus/logo.png" alt="BURGERHAUS" height="52"></a>
+  <a class="brand" href="#home" aria-label="BURGERHAUS Startseite"><img src="https://verblasst-mythos.github.io/Burger-Haus/logo.png" alt="BURGERHAUS" height="52"></a>
   <div class="links" id="links">
     <a href="#speisekarte">Speisekarte</a><a href="#menues">Menüs</a><a href="#bonus">Bonus Card</a><a href="#rad">Glücksrad</a><a href="#ueber">Über uns</a><a href="#kontakt">Kontakt</a>
     <a class="hide" id="navAcc" href="#konto">Mein Konto</a><a class="hide" id="navStaff" href="#team">Team</a>
@@ -171,16 +185,23 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
 </nav></header>
 
 <main id="top">
-<section class="hero-banner"><img src="https://verblasst-mythos.github.io/Burger-Haus/banner.jpg" alt="BURGERHAUS Banner mit goldenem Burger-Wappen, Burgern und Flammen"></section>
-<section class="hero-in">
+<section class="hero-banner" data-view="home"><img src="https://verblasst-mythos.github.io/Burger-Haus/banner.jpg" alt="BURGERHAUS Banner mit goldenem Burger-Wappen, Burgern und Flammen"></section>
+<section class="hero-in" data-view="home">
   <span class="eyebrow">Köln · Neon Smash Burger Diner</span>
   <h1>Willkommen im <span class="pink">Burgerhaus</span></h1>
   <p>Handgemachte Smash Burger, knusprige Wings und eiskalte Drinks mitten in Köln. Jeder Einkauf bringt dich einem kostenlosen Smart Menü näher.</p>
   <div class="row c"><a class="btn" href="#speisekarte">Speisekarte ansehen</a><a class="btn c" href="#bonus">Bonus-Stempelkarte</a><a class="btn o" href="#rad">Glücksrad drehen</a></div>
 </section>
-<div class="marquee" aria-hidden="true"><div class="mq"><span>Smash Burger</span><span>✦</span> <span>Crispy Wings</span><span>✦</span> <span>Milkshakes</span><span>✦</span> <span>Winter Edition</span><span>✦</span> <span>Bonus Card</span><span>✦</span> <span>Glücksrad</span><span>✦</span> <span>Smash Burger</span><span>✦</span> <span>Crispy Wings</span><span>✦</span> <span>Milkshakes</span><span>✦</span> <span>Winter Edition</span><span>✦</span> <span>Bonus Card</span><span>✦</span> <span>Glücksrad</span><span>✦</span></div></div>
+<div class="marquee" aria-hidden="true" data-view="home"><div class="mq"><span>Smash Burger</span><span>✦</span> <span>Crispy Wings</span><span>✦</span> <span>Milkshakes</span><span>✦</span> <span>Winter Edition</span><span>✦</span> <span>Bonus Card</span><span>✦</span> <span>Glücksrad</span><span>✦</span> <span>Smash Burger</span><span>✦</span> <span>Crispy Wings</span><span>✦</span> <span>Milkshakes</span><span>✦</span> <span>Winter Edition</span><span>✦</span> <span>Bonus Card</span><span>✦</span> <span>Glücksrad</span><span>✦</span></div></div>
 
-<section id="speisekarte" class="sec">
+<section class="tiles" data-view="home" aria-label="Bereiche">
+  <a class="tile" href="#speisekarte"><i>🍔</i><strong>Speisekarte</strong><span>Burger, Snacks und Drinks</span></a>
+  <a class="tile" href="#menues"><i>🥡</i><strong>Menüs</strong><span>Pakete für Gruppen und Events</span></a>
+  <a class="tile" href="#bonus"><i>⭐</i><strong>Bonus Card</strong><span>10 Stempel = Gratis-Menü</span></a>
+  <a class="tile" href="#rad"><i>🎡</i><strong>Glücksrad</strong><span>Jeden Tag ein Versuch</span></a>
+</section>
+
+<section id="speisekarte" class="sec" data-view="speisekarte">
   <div class="shead rv"><span class="eyebrow">Frisch vom Grill</span><h2>Unsere <span class="pink">Speisekarte</span></h2>
     <div class="row c" style="margin-top:1.4rem"><button class="btn o" id="cardImgBtn" type="button">Karte als Bild ansehen</button></div></div>
   <div class="cats" id="cats" role="tablist" aria-label="Kategorien"></div>
@@ -188,13 +209,13 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
   <p class="note">Preise in Euro. Allergene und Zusatzstoffe nennen wir dir gern an der Theke.</p>
 </section>
 
-<section id="menues" class="sec" style="padding-top:0">
+<section id="menues" class="sec" data-view="menues">
   <div class="shead rv"><span class="eyebrow">Für Gruppen und Events</span><h2>Unsere <span class="cyan">Menüs</span></h2>
     <p class="lead">Große Pakete für Gruppen, Feiern und Events. Frag an der Theke nach Vorbestellung.</p></div>
   <div class="menu" id="comboGrid"></div>
 </section>
 
-<section id="bonus" class="sec"><div class="split">
+<section id="bonus" class="sec" data-view="bonus"><div class="split">
   <div class="rv">
     <div class="shead left" style="margin-bottom:0"><span class="eyebrow">Unser Bonusprogramm</span><h2>Die <span class="pink">Burgerhaus</span> Bonus Card</h2>
       <p class="lead">Kein Punktesystem, keine Rechnerei: Jeder Einkauf zählt genau einen Stempel, egal wie hoch die Rechnung ist. Bei 10 Stempeln gibt es ein kostenloses Smart Menü.</p></div>
@@ -209,7 +230,7 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
     <div id="cardInfo" class="muted center">10 Stempel = 1x Smart Menü gratis</div></div>
 </div></section>
 
-<section id="rad" class="wheel-sec"><div class="sec split">
+<section id="rad" class="wheel-sec" data-view="rad"><div class="sec split">
   <div class="rv"><div class="wheelbox"><div class="pointer"></div><canvas id="wheel" width="600" height="600" aria-label="Glücksrad"></canvas></div></div>
   <div class="rv">
     <div class="shead left" style="margin-bottom:0"><span class="eyebrow">Täglich ein Versuch</span><h2>Dreh das <span class="cyan">Glücksrad</span></h2>
@@ -219,7 +240,7 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
   </div>
 </div></section>
 
-<section id="konto" class="sec hide">
+<section id="konto" class="sec hide" data-view="konto">
   <div class="shead rv"><span class="eyebrow">Dein Bereich</span><h2>Mein <span class="pink">Konto</span></h2></div>
   <div class="card" style="max-width:760px;margin:auto">
     <div id="me"></div>
@@ -228,7 +249,7 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
   </div>
 </section>
 
-<section id="team" class="sec hide">
+<section id="team" class="sec hide" data-view="team">
   <div class="shead rv"><span class="eyebrow">Nur für Mitarbeiter</span><h2>Team<span class="cyan">bereich</span></h2></div>
   <div class="card">
     <label for="q">Kunde suchen (Name oder Kunden-ID)</label>
@@ -244,7 +265,7 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
   </div>
 </section>
 
-<section id="ueber" class="sec"><div class="split">
+<section id="ueber" class="sec" data-view="ueber"><div class="split">
   <div class="rv"><img class="diner" src="https://verblasst-mythos.github.io/Burger-Haus/diner.jpg" alt="Innenraum des BURGERHAUS mit Neon-Theke und Barhockern" loading="lazy"></div>
   <div class="rv">
     <div class="shead left" style="margin-bottom:0"><span class="eyebrow">Das Burgerhaus</span><h2>Über <span class="pink">uns</span></h2>
@@ -258,7 +279,7 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
   </div>
 </div></section>
 
-<section id="kontakt" class="sec" style="padding-top:0">
+<section id="kontakt" class="sec" data-view="kontakt">
   <div class="shead rv"><span class="eyebrow">Besuch uns</span><h2><span class="cyan">Kontakt</span></h2></div>
   <div class="info rv" style="max-width:420px;margin:auto">
     <div class="card"><i>📍</i><h3>Adresse</h3><p>BURGERHAUS</p><p>Straße an der Autobahn 12</p><p>1105 Köln</p></div>
@@ -268,12 +289,12 @@ footer>div:last-child{max-width:1200px;margin:auto;padding:1.4rem 1.2rem 2rem;di
 
 <footer>
   <div class="fgrid">
-    <div><a class="logo" href="#top" style="display:inline">BURGERHAUS</a><p style="font-size:.85rem">Handgemachte Smash Burger, knusprige Wings und eiskalte Drinks. Neon-Diner mitten in Köln, vor Ort, zum Mitnehmen oder als Catering.</p></div>
+    <div><a class="logo" href="#home" style="display:inline">BURGERHAUS</a><p style="font-size:.85rem">Handgemachte Smash Burger, knusprige Wings und eiskalte Drinks. Neon-Diner mitten in Köln, vor Ort, zum Mitnehmen oder als Catering.</p></div>
     <div><h4>ENTDECKEN</h4><a href="#speisekarte">Speisekarte</a><a href="#menues">Unsere Menüs</a><a href="#bonus">Bonus Card</a><a href="#rad">Glücksrad</a></div>
     <div><h4>RESTAURANT</h4><a href="#ueber">Über uns</a><a href="#kontakt">Kontakt</a><button class="lk" data-legal="impressum">Impressum</button><button class="lk" data-legal="datenschutz">Datenschutz</button></div>
     <div><h4>TEAM-LOGIN</h4><button class="lk" id="teamLogin">Mitarbeiterbereich</button></div>
   </div>
-  <div><span>© 2026 BURGERHAUS · Inhaber Cano Yilmaz</span><span>Dein Burger. Dein Geschmack. Dein BURGERHAUS.</span></div>
+  <div><span>© 2026 BURGERHAUS · Inhaber Cano Yilmaz · Version 25.11-b</span><span>Dein Burger. Dein Geschmack. Dein BURGERHAUS.</span></div>
 </footer>
 
 <dialog id="cardDlg" class="legal">
@@ -469,6 +490,7 @@ function render(){
   $("spinBtn").disabled=done;$("spinMsg").className="msg";
   $("spinMsg").textContent=done?"Heute hast du schon gedreht. Komm morgen wieder!":"";
   document.querySelectorAll("[data-auth]").forEach(b=>b.textContent=me?"Mein Konto ansehen":"Konto anlegen");
+  if(window.route)route(false);
 }
 
 function showPrizes(data){
@@ -582,6 +604,16 @@ loadMenu();
   const sc=()=>h.classList.toggle("solid",scrollY>40);sc();addEventListener("scroll",sc,{passive:true});
   b.onclick=()=>{const o=l.classList.toggle("open");b.setAttribute("aria-expanded",o);b.setAttribute("aria-label",o?"Menü schließen":"Menü öffnen")};
   l.addEventListener("click",e=>{if(e.target.tagName==="A"){l.classList.remove("open");b.setAttribute("aria-expanded","false")}});
+  const VIEWS=["home","speisekarte","menues","bonus","rad","ueber","kontakt","konto","team"];
+  window.route=function(scroll){
+    let v=location.hash.slice(1)||"home";if(!VIEWS.includes(v))v="home";
+    const t=[...document.querySelectorAll('[data-view="'+v+'"]')];
+    if(!t.length||t.every(e=>e.classList.contains("hide")))v="home";
+    document.querySelectorAll("[data-view]").forEach(e=>e.classList.toggle("active",e.dataset.view===v));
+    document.querySelectorAll("#links a").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+v));
+    document.body.dataset.view=v;if(scroll)window.scrollTo(0,0);
+  };
+  addEventListener("hashchange",()=>route(true));route(true);
   const els=document.querySelectorAll(".rv");
   if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.12});els.forEach(e=>io.observe(e))}
   else els.forEach(e=>e.classList.add("in"));
